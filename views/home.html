@@ -1,0 +1,44 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Vapor Community Market</title>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/xp.css">
+        <style>
+            .center-container {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-content: center;
+
+                width: 100%;
+                height: 100%;
+
+                min-height: 100vh;
+
+                background-image: url("${pageContext.request.contextPath}/assets/background.png");
+            }
+        </style>
+    </head>
+    <body>
+        <main class="center-container">
+            <div class="window" style="width: 300px">
+                <div class="title-bar">
+                    <div class="title-bar-text">Not Logged In</div>
+                    <div class="title-bar-controls">
+                        <button aria-label="Minimize"></button>
+                        <button aria-label="Maximize"></button>
+                        <button aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="window-body">
+                    <p>Please login or sign up</p>
+                    <section class="field-row" style="justify-content: flex-end">
+                        <button>Login</button>
+                        <a role="button" href="/signup.jsp">Signup</a>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>

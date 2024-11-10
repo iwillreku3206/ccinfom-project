@@ -1,0 +1,40 @@
+<!--
+* @ Author: Group 1
+* @ Create Time: 2024-09-26 13:33:38
+* @ Modified time: 2024-09-26 13:42:14
+* @ Description:
+
+Landing page if user is not logged in
+-->
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Vapor Community Market</title>
+  <link rel="stylesheet" href="/assets/xp.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+
+<body>
+  <main class="center-container">
+    <div class="window" style="width: 300px">
+      <div class="title-bar">
+        <div class="title-bar-text">Not Logged In</div>
+        <div class="title-bar-controls">
+          <button aria-label="Minimize"></button>
+          <button aria-label="Maximize"></button>
+          <button aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="window-body">
+        <p>Please log in or register</p>
+        <section class="field-row" style="justify-content: flex-end">
+          <button role="link" onclick="location.href = '/login.jsp'">Login</button>
+          <button role="link" onclick="location.href = '/register.jsp'">Register</button>
+        </section>
+      </div>
+    </div>
+  </main>
+</body>
+
+</html>
