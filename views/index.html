@@ -20,17 +20,12 @@ Landing page if user is not logged in
     <div class="window" style="width: 300px">
       <div class="title-bar">
         <div class="title-bar-text">Not Logged In</div>
-        <div class="title-bar-controls">
-          <button aria-label="Minimize"></button>
-          <button aria-label="Maximize"></button>
-          <button aria-label="Close"></button>
-        </div>
       </div>
       <div class="window-body">
         <p>Please log in or register</p>
         <section class="field-row" style="justify-content: flex-end">
-          <button role="link" onclick="location.href = '/login.jsp'">Login</button>
-          <button role="link" onclick="location.href = '/register.jsp'">Register</button>
+          <button role="link" onclick="location.href = '/auth/login'">Login</button>
+          <button role="link" onclick="location.href = '/auth/register'">Register</button>
         </section>
       </div>
     </div>

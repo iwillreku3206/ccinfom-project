@@ -2,6 +2,8 @@ import express, { type NextFunction, type Request, type Response } from 'express
 import log from 'log'
 import { loadTemplate } from '../util/loadTemplate'
 import mustache from 'mustache'
+import { authRouter } from '../controllers/authController'
+import { rootRouter } from '../controllers/rootController'
 
 export const app = express()
 
@@ -14,6 +16,5 @@ app.use(logger)
 app.use(express.urlencoded({}))
 app.use(express.static("public"))
 
-app.get('/', async (_req, res) => {
-  res.send(mustache.render(await loadTemplate("index"), {}))
-})
+app.use("/auth", authRouter)
+app.use("/", rootRouter)
