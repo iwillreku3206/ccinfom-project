@@ -49,10 +49,11 @@ export async function getUserByUsername(username: string): Promise<User | null> 
 }
 
 export async function getUserBySession(sessionId: string): Promise<User | null> {
+  if (!sessionId) return null
   const [results, _] = await db.execute<RowDataPacket[]>(`
-    SELECT    u.id AS id
+    SELECT    u.id AS id,
               u.username AS username,
-              u.display_name AS displayName
+              u.display_name AS displayName,
               u.balance AS balance,
               u.user_type AS userType,
               u.password_hash AS passwordHash
@@ -60,8 +61,16 @@ export async function getUserBySession(sessionId: string): Promise<User | null> 
     JOIN      users u
           ON  s.user = u.id
     WHERE     s.expiry > NOW()
+          AND s.id = ?
     LIMIT 1;
-  `)
+  `, [sessionId])
 
+  if (results.length < 1)
+    return null
 
+  if (!results[0].id || !results[0].username || !results[0].displayName || !results[0].balance || !results[0].userType || !results[0].passwordHash) {
+    log.error("Invalid user: ", JSON.stringify(results[0]))
+    return null
+  }
+  return results[0] as User
 }
