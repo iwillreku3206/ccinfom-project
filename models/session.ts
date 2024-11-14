@@ -59,3 +59,11 @@ export async function createSession(userId: number, userAgent: string, retries =
   }
   return { id, expiry }
 }
+
+export async function expireSession(sessionId: string): Promise<void> {
+  const [_, __] = await db.execute<ResultSetHeader>(`
+    UPDATE \`sessions\`
+    SET     expiry = NOW()
+    WHERE   id = ?;
+  `, [sessionId])
+}

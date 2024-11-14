@@ -3,7 +3,7 @@ import { createUser, getUserByUsername } from '../models/user'
 import mustache from 'mustache'
 import { loadTemplate } from '../util/loadTemplate'
 import argon2 from 'argon2'
-import { createSession, type Session } from '../models/session'
+import { createSession, expireSession, type Session } from '../models/session'
 
 export const authRouter = express.Router()
 
@@ -84,6 +84,7 @@ authRouter.post<{}, {}, { username?: string, password?: string }>('/login', asyn
 })
 
 authRouter.post('/logout', async (req, res) => {
-
+  await expireSession(req.cookies?.session)
+  res.clearCookie("session").redirect("/")
 })
 
