@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Vapor Community Market</title>
+  <link rel="stylesheet" href="/assets/xp.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+
+<body>
+  <main class="center-container">
+    <div class="window" style="width: 300px">
+      <div class="title-bar">
+        <div class="title-bar-text">My Profile</div>
+        <div class="title-bar-controls">
+          <button aria-label="Close" onclick="location.href='/home'"></button>
+        </div>
+      </div>
+      <div class="window-body">
+        <p style="color: red">{{error}}</p>
+        <div class="field-row">
+          <fieldset>
+            <legend>Update your profile</legend>
+            <form action="/profile/update" method="post">
+              <label for="username">Username: </label>
+              <input type="text" name="username" id=" username" value="{{username}}" />
+              <label for="displayName">Display Name: </label>
+              <input type="text" name="displayName" id="displayName" value="{{displayName}}">
+              <button type="submit">Update</button>
+            </form>
+          </fieldset>
+        </div>
+        <div class="field-row">
+          <fieldset>
+            <legend>Update your password</legend>
+            <form action="/auth/password/update" method="post">
+              <label for="password">Password: </label>
+              <input type="password" name="password" id="password" />
+              <button type="submit">Update</button>
+            </form>
+          </fieldset>
+        </div>
+      </div>
+      <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
+    </div>
+  </main>
+</body>
+
+</html>

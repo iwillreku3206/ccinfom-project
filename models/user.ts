@@ -1,6 +1,7 @@
 import { type RowDataPacket, type ResultSetHeader } from "mysql2"
 import { db } from "../app/database"
 import log from "log"
+import argon2 from 'argon2'
 
 export interface User {
   id: number,
@@ -73,4 +74,32 @@ export async function getUserBySession(sessionId: string): Promise<User | null> 
     return null
   }
   return results[0] as User
+}
+
+export async function updateUserProfileBySession(session: string, username: string, displayName: string): Promise<void> {
+  if (username == "") throw new Error("Username cannot be empty")
+  if (displayName == "") displayName = username;
+  const [_, __] = await db.execute<ResultSetHeader>(`
+    UPDATE users u
+      JOIN sessions s
+      ON s.user = u.id
+        AND s.id = ?
+        AND s.expiry > NOW()
+      SET u.username = ?,
+          u.display_name = ?;
+  `, [session, username, displayName])
+}
+
+
+export async function updateUserPasswordBySession(session: string, password: string): Promise<void> {
+  if (password == "") throw new Error("Password cannot be empty")
+  const password_hash = await argon2.hash(password)
+  const [_, __] = await db.execute<ResultSetHeader>(`
+    UPDATE users u
+      JOIN sessions s
+      ON s.user = u.id
+        AND s.id = ?
+        AND s.expiry > NOW()
+      SET u.password_hash = ?;
+  `, [session, password_hash])
 }

@@ -1,10 +1,9 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
 import log from 'log'
-import { loadTemplate } from '../util/loadTemplate'
-import mustache from 'mustache'
 import { authRouter } from '../controllers/authController'
 import { rootRouter } from '../controllers/rootController'
 import cookieParser from 'cookie-parser'
+import { profileRouter } from '../controllers/profileController'
 
 export const app = express()
 
@@ -20,3 +19,4 @@ app.use(cookieParser())
 
 app.use("/auth", authRouter)
 app.use("/", rootRouter)
+app.use("/profile", profileRouter)

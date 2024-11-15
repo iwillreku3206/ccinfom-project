@@ -2,6 +2,7 @@ import express from 'express'
 import mustache from 'mustache'
 import { loadTemplate } from '../util/loadTemplate'
 import { getUserBySession } from '../models/user'
+import { isLoggedIn } from './authController'
 
 export const rootRouter = express.Router()
 
@@ -11,8 +12,8 @@ rootRouter.get('/', async (req, res) => {
   res.send(mustache.render(await loadTemplate("index"), {}))
 })
 
-rootRouter.get('/home', async (req, res) => {
+rootRouter.get('/home', isLoggedIn, async (req, res) => {
   const user = await getUserBySession(req.cookies?.session || '')
 
-  res.send(mustache.render(await loadTemplate("home"), {}))
+  res.send(mustache.render(await loadTemplate("home"), { username: user?.username, displayName: user?.displayName || user?.username }))
 })

@@ -41,7 +41,7 @@ export async function createSession(userId: number, userAgent: string, retries =
     INSERT INTO \`sessions\` 
       (id, user, expiry) 
       VALUES (?, ?, ?);
-    `, [id, userId, expiry])
+    `, [id, userId, expiry]) 
 
   const [results2, __] = await db.execute<ResultSetHeader>(`
     INSERT INTO \`login_history\`

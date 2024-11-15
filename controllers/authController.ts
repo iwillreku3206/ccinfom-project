@@ -1,5 +1,5 @@
-import express, { type Request, type Response } from 'express'
-import { createUser, getUserByUsername } from '../models/user'
+import express, { type NextFunction, type Request, type Response } from 'express'
+import { createUser, getUserBySession, getUserByUsername, updateUserPasswordBySession } from '../models/user'
 import mustache from 'mustache'
 import { loadTemplate } from '../util/loadTemplate'
 import argon2 from 'argon2'
@@ -79,7 +79,7 @@ authRouter.post<{}, {}, { username?: string, password?: string }>('/login', asyn
       expires: session.expiry
     }).redirect("/home")
   } catch (error) {
-    return res.status(500).redirect("/auth/login?error=" + error)
+    return res.redirect("/auth/login?error=" + error)
   }
 })
 
@@ -88,3 +88,18 @@ authRouter.post('/logout', async (req, res) => {
   res.clearCookie("session").redirect("/")
 })
 
+authRouter.post('/password/update', isLoggedIn, async (req, res) => {
+  try {
+    await updateUserPasswordBySession(req.cookies.session, req.body.password || "");
+  } catch (error) {
+    return res.redirect("/profile/update?error=" + error)
+  }
+  return res.redirect("/home")
+})
+
+
+export async function isLoggedIn(req: Request, res: Response, next: NextFunction) {
+  const user = await getUserBySession(req.cookies?.session || '')
+  if (!user) return res.clearCookie('session').redirect('/')
+  next()
+}
