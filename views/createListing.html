@@ -38,6 +38,7 @@
       height: 32px;
       image-rendering: pixelated;
     }
+
   </style>
 </head>
 
@@ -45,23 +46,28 @@
   <main class="center-container">
     <div class="window" style="width: 300px">
       <div class="title-bar">
-        <div class="title-bar-text">Vapor Market</div>
+        <div class="title-bar-text">Vapor Market - Listings</div>
       </div>
       <div class="window-body" style="background: white">
-        <div class="menu-container">
-          <a href="/profile/update" class="menu-item"><img src="/assets/user.png" alt="" class="menu-icon"><span
-              class="menu-text">Update User Profile</span></a>
-          <a href="/listing/list" class="menu-item"><img src="/assets/viewlistings.png" alt="" class="menu-icon"><span
-              class="menu-text">View Listings</span></a>
-          <a href="/listing/create" class="menu-item"><img src="/assets/createlisting.png" alt="" class="menu-icon"><span
-              class="menu-text">Post Item for Selling</span></a>
-          <form action="/auth/logout" method="post">
-            <button type="submit" class="menu-item"><img src="/assets/logout.png" alt="" class="menu-icon"><span
-                class="menu-text">Logout</span></button>
-          </form>
-        </div>
-      </div>
-      <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
+				<p>Enter listing details</p>
+				<p style="color: red">{{error}}</p>
+				<form method="POST" action="/listing/post">
+					<div class="field-row">
+						<label for="item">Item Name</label>
+						<input id="item" type="text" name="item" required />
+					</div>
+
+					<div class="field-row">
+						<label for="price">Price</label>
+						<input id="price" type="text" name="price" required />
+					</div>
+
+					<section class="field-row" style="justify-content: flex-end">
+            <button type="reset">Reset</button>
+            <button type="submit">Submit</button>
+          </section>
+				</form>      
+			</div>
     </div>
   </main>
 </body>
