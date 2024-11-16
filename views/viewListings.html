@@ -52,6 +52,27 @@
 				<table class="table">
 
 				</table>
+				<br>
+				<form method="POST" action="/listing/list">
+					<label for="item">Filter by item</label>
+					<input type="text" name="item" id="item" placeholder="none" value="">
+					
+					<label for="item">Filter by seller</label>
+					<input type="text" name="seller" id="seller" placeholder="none" value="">
+					
+					<label for="item">Filter by price</label>
+					<input type="text" name="price" id="price" placeholder="none" value="">
+
+					<label for="item">Filter by date</label>
+					<input type="text" name="date" id="date" placeholder="none" value="">
+					<br>
+					<br>
+					
+					<section class="field-row" style="justify-content: flex-end">
+            <button type="reset">Reset</button>
+            <button type="submit">Filter</button>
+          </section>
+				</form>
       </div>
       <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
     </div>

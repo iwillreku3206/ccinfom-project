@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-16 10:43:56
- * @ Modified time: 2024-11-16 13:08:40
+ * @ Modified time: 2024-11-16 14:20:28
  * @ Description:
  * 
  * Manages mapping listings to runtime objects.
@@ -73,11 +73,11 @@ export const Listing = (() => {
 		 * @return					A promise for the results of the select query. 
 		 */
 		getListings: (filter?: String, ...values: any[]) => (
-			(
-				filter === 'item' 			? query(get_listing_by_item_query, values) 
-			: filter === 'price' 			? query(get_listing_by_price_query, values)
-			: filter === 'seller' 		? query(get_listing_by_seller_query, values)
-			: filter === 'list_date' 	? query(get_listing_by_list_date_query, values)
+			(console.log(filter),
+				filter === 'item' 			? query(get_listing_by_item_query, ...values) 
+			: filter === 'price' 			? query(get_listing_by_price_query, ...values)
+			: filter === 'seller' 		? query(get_listing_by_seller_query, ...values)
+			: filter === 'list_date' 	? query(get_listing_by_list_date_query, ...values)
 			: query(get_listings_query))
 		)
 	}

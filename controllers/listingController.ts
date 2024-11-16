@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-16 11:34:48
- * @ Modified time: 2024-11-16 13:52:24
+ * @ Modified time: 2024-11-16 14:15:19
  * @ Description:
  * 
  * A controller for the listings-related pages and functionality.
@@ -30,6 +30,27 @@ listingRouter.get('/create', isLoggedIn, async(req: Request, res: Response) => {
 listingRouter.get('/list', isLoggedIn, async (req: Request, res: Response) => {
   const { user, error } = res.locals;
   const listingData = JSON.stringify(await Listing.getListings())
+  res.send(mustache.render(await loadTemplate("viewListings"), { listingData, error }))
+})
+
+/**
+ * Grabs the listings associated with the user.
+ */
+listingRouter.post('/list', isLoggedIn, async (req: Request, res: Response) => {
+  const { user, error } = res.locals;
+  const { item, seller, price, date } = req.body;
+
+  // ! remove the parsing here
+  // ! improve logic
+  const listings = await (() => (
+      item?.length    ? Listing.getListings('item', parseInt(item))
+    : seller?.length  ? Listing.getListings('seller', parseInt(seller)) 
+    // : price?.length   ? Listing.getListings('price', parseFloat(price)) 
+    // : date?.length    ? Listing.getListings('list_date', date)
+    : Listing.getListings() 
+    ))()
+  const listingData = JSON.stringify(listings)
+
   res.send(mustache.render(await loadTemplate("viewListings"), { listingData, error }))
 })
 
