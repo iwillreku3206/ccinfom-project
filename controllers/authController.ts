@@ -104,5 +104,6 @@ export async function isLoggedIn(req: Request, res: Response, next: NextFunction
   
   // Save the user here so we don't have to find it each time
   res.locals.user = user;
+  res.locals.error = req.query.error?.toString() ?? '';
   next()
 }
