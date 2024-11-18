@@ -101,5 +101,9 @@ authRouter.post('/password/update', isLoggedIn, async (req, res) => {
 export async function isLoggedIn(req: Request, res: Response, next: NextFunction) {
   const user = await getUserBySession(req.cookies?.session || '')
   if (!user) return res.clearCookie('session').redirect('/')
+  
+  // Save the user here so we don't have to find it each time
+  res.locals.user = user;
+  res.locals.error = req.query.error?.toString() ?? '';
   next()
 }
