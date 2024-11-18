@@ -42,3 +42,19 @@ export async function getGameByName(gameName: string): Promise<Games | null> {
     }
     return results[0] as Games
 }
+
+export async function getAllGames(): Promise<Games | null> {
+    const [results, _] = await db.execute<RowDataPacket[]>(
+        `SELECT     id,
+                    name,
+                    description
+        FROM        games`
+    )
+
+    if (results.length < 1) {
+        log.error("no games available")
+        return null
+    }
+
+    return results[0] as Games
+}

@@ -45,3 +45,24 @@ export async function getItemByName(itemName: string): Promise<Items | null> {
     }
     return results[0] as Items
 }
+
+export async function getItemsByGame(gameName: string): Promise<Items | null> {
+    const [results, _] = await db.execute<RowDataPacket[]>(
+        `SELECT     id,
+                    name,
+                    description,
+                    game
+        FROM        items i
+        JOIN        games g
+        ON          i.game = g.id
+        AND         g.name = ?;`
+        , [gameName]
+    )
+
+    if (results.length < 1) {
+        log.error("no items")
+        return null
+    }
+
+    return results[0] as Items
+}

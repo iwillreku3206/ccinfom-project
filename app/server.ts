@@ -4,6 +4,7 @@ import { authRouter } from '../controllers/authController'
 import { rootRouter } from '../controllers/rootController'
 import cookieParser from 'cookie-parser'
 import { profileRouter } from '../controllers/profileController'
+import { gamesRouter } from '../controllers/gamesController'
 
 export const app = express()
 
@@ -20,3 +21,4 @@ app.use(cookieParser())
 app.use("/auth", authRouter)
 app.use("/", rootRouter)
 app.use("/profile", profileRouter)
+app.use("/games", gamesRouter)
