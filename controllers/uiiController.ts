@@ -10,7 +10,17 @@ import { getUserBySession, getUserByUsername } from '../models/user'
 
 
 
-const pageRender = async (templateName: string, viewOpts: {}) => mustache.render(await loadTemplate(templateName), viewOpts)
+const pageRender = async (res: Response, templateName: string, viewOpts: {}) => res.send(mustache.render(await loadTemplate(templateName), viewOpts))
+const redirectError = (res: Response, error_code: string) => res.redirect("/userinventoryitems/inspect?error="+error_code);
+
+const ERRCODES = Object.freeze({
+    INVALID_SESSION : "invalid_session"
+  , MISSING_FIELDS  : "missing_fields"
+  , MISSING_USER    : "missing_user"
+  , NO_ITEMS        : "no_items"
+  
+})
+
 
 export const userInvItemsRouter = express.Router()
 
@@ -21,11 +31,11 @@ userInvItemsRouter.get('/usersitems', isLoggedIn, async(req, res) =>{
     const user = await getUserBySession(session)
 
     if (user == null)
-      return res.redirect("/userinventoryitems/inspect/?error=invalid_session")
+      return redirectError(res, ERRCODES["INVALID_SESSION"])
 
     return res.redirect("/userinventoryitems/"+user.username)
   } catch {
-    return res.redirect("/userinventoryitems/inspect/?error=invalid_session")
+    return redirectError(res, ERRCODES["INVALID_SESSION"])
   }
   
 })
@@ -36,20 +46,17 @@ userInvItemsRouter.get('/:username', isLoggedIn, async(req, res) =>{
   console.log(username)
 
   if (!username)
-    return res.redirect("/userinventoryitems/inspect/?error=missingfields")
-
+    return redirectError(res, ERRCODES["MISSING_FIELDS"])
   
   try {
     const user = await (getUserByUsername(username))
-
     if (!user)
-      return res.redirect("/userinventoryitems/inspect?error=noaccount")
+      return redirectError(res, ERRCODES["MISSING_USER"])
     
     const selectedItems = await (getInventoryItemByUserId(user?.id))
     console.log(selectedItems)
-
     if (!selectedItems)
-      return res.redirect("/userinventoryitems/inspect?error=no_items")
+      return redirectError(res, ERRCODES["NO_ITEMS"])
     
     const viewOpts = {
       username: user?.username,
@@ -57,11 +64,9 @@ userInvItemsRouter.get('/:username', isLoggedIn, async(req, res) =>{
       items: selectedItems
     }
 
-    res.send(await pageRender("profileItems", viewOpts));
-
-
+    await pageRender(res, "profileItems", viewOpts);
   } catch (error) {
-    return res.redirect("/userinventoryitems/inspect?error=" + error)
+    return redirectError(res, String(error))
   }
 })
 
@@ -79,7 +84,8 @@ userInvItemsRouter.get('/inspect', isLoggedIn, async (req, res) => {
     items: "No items",
     error
   }
-  res.send(await pageRender("userInventoryItems", viewOpts))
+
+  await pageRender(res, "userInventoryItems", viewOpts)
 })
 
 
@@ -94,34 +100,18 @@ userInvItemsRouter.post('/inspect', isLoggedIn, async (req, res) => {
     const selectedUser = await (getUserByUsername(username))
 
     if (!selectedUser)
-      return res.redirect("/userinventoryitems/inspect?error=noaccount")
+      return redirectError(res, ERRCODES["MISSING_USER"])
     
     const selectedItems = await (getInventoryItemByUserId(selectedUser?.id))
     console.log(selectedItems)
 
     if (!selectedItems)
-      return res.redirect("/userinventoryitems/inspect?error=no_items")
+      return redirectError(res, ERRCODES["NO_ITEMS"])
     
     const viewOpts = {items: selectedItems}
 
-    res.send(await pageRender("userInventoryItems", viewOpts));
-
-
+    await pageRender(res, "userInventoryItems", viewOpts);
   } catch (error) {
-    return res.redirect("/userinventoryitems/inspect?error=" + error)
+    return redirectError(res, String(error))
   }
 })
-
-/**
- * userInventoryItemsRouter.post(`/addItems`, async (req, res) => {
-  let body = req.body
-
-  try {
-    const user = await getUserByUsername(body.username)
-  } catch (error) {
-    return res.redirect("/userinventoryitems/addItems?error=" + error)
-  }
-
-})
- * 
- */
