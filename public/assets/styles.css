@@ -22,11 +22,13 @@ body {
 }
 
 * {
+  box-sizing: border-box;
   font-smooth: never;
   -moz-osx-font-smoothing: never;
   -webkit-font-smoothing: never;
 }
 
+/* Menu styling */
 .menu-container {
   display: grid;
   grid-template-columns: repeat(5, 48px);
@@ -58,4 +60,24 @@ body {
   width: 32px;
   height: 32px;
   image-rendering: pixelated;
+}
+
+/* Table styling */
+table {
+  padding: 1em;
+}
+
+/* Form styling */
+form {
+  padding: 1em;
+}
+
+label, input {
+  display: inline-block;
+  width: 43%;
+  margin: 0.25em;
+}
+
+.form-buttons {
+  right: 0;
 }
