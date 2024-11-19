@@ -1,14 +1,15 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-19 13:53:00
- * @ Modified time: 2024-11-19 14:58:01
+ * @ Modified time: 2024-11-19 16:38:54
  * @ Description:
  * 
  * A template for model classes.
  */
 
-import { type RowDataPacket, type ResultSetHeader } from "mysql2"
+import { type RowDataPacket, type ResultSetHeader, type QueryResult } from "mysql2"
 import { db } from "../app/database"
+import log from "log"
 
 /**
  * Consider this an abstract class which we can extend for other models.
@@ -31,8 +32,11 @@ export const Model = <IModel>() => {
 	 * @return							A promise for the results of the query.
 	 */
 	const query = async (queryString: string, ...params: any[]) => 
-		(([ results, _ ]) => (results))
-			(await db.execute<ResultSetHeader>(queryString, params))
+		(([ results, _ ]) => (
+			results.length
+				? results
+				: []
+		))(await db.execute<QueryResult & RowDataPacket[]>(queryString, params))
 
 	// Public class interface
 	const _ =  {

@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-16 10:43:56
- * @ Modified time: 2024-11-19 14:53:39
+ * @ Modified time: 2024-11-19 16:18:32
  * @ Description:
  * 
  * Manages mapping listings to runtime objects.
@@ -23,8 +23,8 @@ interface IListing {
 export const Listing = Model<IListing>()
 
 // Specs
-type create_listing_spec = Omit<IListing, 'id' | 'list_date' | 'sold'>
-type get_listing_spec = Partial<IListing>
+type create_listing_spec 	= Omit<IListing, 'id' | 'list_date' | 'sold'>
+type get_listing_spec 		= Partial<IListing>
 
 // The model queries
 const create_listing_query 						= `INSERT INTO \`listings\` (item, price, seller) VALUES (?, ?, ?);`;

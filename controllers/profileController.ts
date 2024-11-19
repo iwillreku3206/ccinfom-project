@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from 'express'
 import { isLoggedIn } from './authController'
-import { getUserBySession, updateUserProfileBySession } from '../models/user'
+import { User } from '../models/user'
 import mustache from 'mustache'
 import { loadTemplate } from '../util/loadTemplate'
 
@@ -21,7 +21,7 @@ profileRouter.get('/update', isLoggedIn, async (req: Request, res: Response) => 
 // HTML forms do not support PUT/PATCH
 profileRouter.post('/update', isLoggedIn, async (req: Request, res: Response) => {
   try {
-    await updateUserProfileBySession(req.cookies.session, req.body.username, req.body.displayName)
+    await User.execute('update-profile-by-session', { sessionId: req.cookies.session, username: req.body.username, displayName: req.body.displayName })
   } catch (error) {
     return res.redirect("/profile/update?error=" + error)
   }

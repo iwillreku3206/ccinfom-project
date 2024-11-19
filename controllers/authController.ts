@@ -1,5 +1,5 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
-import { createUser, getUserBySession, getUserByUsername, updateUserPasswordBySession } from '../models/user'
+import { User } from '../models/user'
 import mustache from 'mustache'
 import { loadTemplate } from '../util/loadTemplate'
 import argon2 from 'argon2'
@@ -29,7 +29,7 @@ authRouter.post<{}, {}, { username?: string, password?: string, displayName?: st
 
   try {
     // this can error out
-    await createUser({
+    await User.execute('create', {
       username: req.body.username,
       passwordHash,
       displayName: req.body.displayName,
@@ -52,6 +52,7 @@ authRouter.get('/login', async (req, res) => {
   } else if (req.query.error) {
     viewOpts.error = req.query.error.toString()
   }
+
   res.send(mustache.render(await loadTemplate("login"), viewOpts))
 })
 
@@ -61,7 +62,7 @@ authRouter.post<{}, {}, { username?: string, password?: string }>('/login', asyn
 
   try {
     // this can error out
-    const user = await getUserByUsername(req.body.username)
+    const user = (await User.execute('get-by-username', { username: req.body.username }))[0]
 
     if (!user)
       return res.redirect('/auth/login?error=noaccount')
@@ -89,8 +90,11 @@ authRouter.post('/logout', async (req, res) => {
 })
 
 authRouter.post('/password/update', isLoggedIn, async (req, res) => {
+
+  const passwordHash = await argon2.hash(req.body.password)
+
   try {
-    await updateUserPasswordBySession(req.cookies.session, req.body.password || "");
+    await User.execute('update-password-by-session', { sessionId: req.cookies.session, passwordHash });
   } catch (error) {
     return res.redirect("/profile/update?error=" + error)
   }
@@ -99,7 +103,7 @@ authRouter.post('/password/update', isLoggedIn, async (req, res) => {
 
 
 export async function isLoggedIn(req: Request, res: Response, next: NextFunction) {
-  const user = await getUserBySession(req.cookies?.session || '')
+  const user = (await User.execute('get-by-session', { sessionId: req.cookies?.session || '' }))[0]
   if (!user) return res.clearCookie('session').redirect('/')
   
   // Save the user here so we don't have to find it each time
