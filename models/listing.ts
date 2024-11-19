@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-16 10:43:56
- * @ Modified time: 2024-11-19 16:18:32
+ * @ Modified time: 2024-11-19 16:44:04
  * @ Description:
  * 
  * Manages mapping listings to runtime objects.
@@ -10,7 +10,7 @@
 import { Model } from "./model"
 
 // The interface
-interface IListing {
+export interface IListing {
 	id: number,
 	item: number,
 	price: number,
@@ -20,7 +20,7 @@ interface IListing {
 }
 
 // The model to use
-export const Listing = Model<IListing>()
+export const Listing = Model()
 
 // Specs
 type create_listing_spec 	= Omit<IListing, 'id' | 'list_date' | 'sold'>

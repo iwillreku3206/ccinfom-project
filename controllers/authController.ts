@@ -3,7 +3,9 @@ import { User } from '../models/user'
 import mustache from 'mustache'
 import { loadTemplate } from '../util/loadTemplate'
 import argon2 from 'argon2'
-import { createSession, expireSession, type Session } from '../models/session'
+import crypto from 'crypto'
+import { Session } from '../models/session'
+import UAParser from 'ua-parser-js'
 
 export const authRouter = express.Router()
 
@@ -73,11 +75,22 @@ authRouter.post<{}, {}, { username?: string, password?: string }>('/login', asyn
     if (!passOk)
       return res.redirect('/auth/login?error=noaccount')
 
+    const id = crypto.randomBytes(32).toString('hex')
+    const expiry = new Date((new Date()).getTime() + 1000 * 60 * 60 * 24 * 30)
+    const userAgent = new UAParser(req.headers['user-agent'] || '')
+
     // password is ok, we create the session
-    const session = await createSession(user.id, req.headers['user-agent'] || '')
-    return res.cookie("session", session.id, {
+    await Session.execute('create', { 
+      id, expiry, 
+      userId: user.id, 
+      session: id,
+      browser: userAgent.getBrowser().name || '',
+      platform: userAgent.getOS().name || '' 
+    })
+
+    return res.cookie("session", id, {
       httpOnly: true,
-      expires: session.expiry
+      expires: expiry
     }).redirect("/home")
   } catch (error) {
     return res.redirect("/auth/login?error=" + error)
@@ -85,7 +98,7 @@ authRouter.post<{}, {}, { username?: string, password?: string }>('/login', asyn
 })
 
 authRouter.post('/logout', async (req, res) => {
-  await expireSession(req.cookies?.session)
+  await Session.execute('expire', { id: req.cookies?.session })
   res.clearCookie("session").redirect("/")
 })
 

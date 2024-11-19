@@ -1,7 +1,6 @@
-import argon2 from 'argon2'
 import { Model } from "./model"
 
-interface IUser {
+export interface IUser {
   id: number,
   username: string,
   displayName: string,
@@ -11,7 +10,7 @@ interface IUser {
 };
 
 // The model to use
-export const User = Model<IUser>();
+export const User = Model();
 
 // Specs
 type create_user_spec                       = Omit<IUser, 'id' | 'balance'>

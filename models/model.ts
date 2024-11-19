@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-19 13:53:00
- * @ Modified time: 2024-11-19 16:38:54
+ * @ Modified time: 2024-11-19 17:32:07
  * @ Description:
  * 
  * A template for model classes.
@@ -16,7 +16,7 @@ import log from "log"
  * 
  * @class 
  */
-export const Model = <IModel>() => {
+export const Model = () => {
 
 	/**
 	 * A map of queries.
@@ -36,7 +36,8 @@ export const Model = <IModel>() => {
 			results.length
 				? results
 				: []
-		))(await db.execute<QueryResult & RowDataPacket[]>(queryString, params))
+		))(await db.execute<QueryResult & RowDataPacket[]>
+			(queryString, params.map(p => p === undefined ? null : p)))
 
 	// Public class interface
 	const _ =  {
@@ -53,12 +54,16 @@ export const Model = <IModel>() => {
 		 */
 		register: (
 			name: 				string, 
-			query_string: string, 
-			mapper: 			Function=((i: any) => i)
+			query_string: string | string[], 
+			mapper: 			Function | Function[]=((i: any) => i)
 		) => (
 
 			// Register the query into the map
-			QUERIES.set(name, (input: any) => query(query_string, ...mapper(input))),
+			QUERIES.set(name, (input: any) => 
+				Array.isArray(query_string) 
+					? Promise.all(query_string.map(q_string => 
+						query(q_string, ...(Array.isArray(mapper) ? mapper[query_string.indexOf(q_string)](input) : []))))
+					: query(query_string, ...(!Array.isArray(mapper) ? mapper(input) : []))),
 			_
 		),
 
