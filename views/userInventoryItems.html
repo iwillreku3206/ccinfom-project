@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Vapor Community Market</title>
+  <link rel="stylesheet" href="/assets/xp.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+
+<body>
+  <main class="center-container">
+
+    <div class="window" style="width: 500px">
+      <div class="title-bar">
+        
+        <div class="title-bar-text">Search inventory items</div>
+
+        <div class="title-bar-controls">
+          <button aria-label="Close" onclick="location.href='/'"></button>
+        </div>
+        
+      </div>
+      <div class="window-body">
+        <p class="">Vaporwave Market inventory items</p>
+        <p>Enter details to inspect</p>
+        
+
+        <form action="/userInventoryItems/inspect" method="post">
+          <div class="field-row">
+            <label for="username">Username</label>
+            <input id="username" type="text" name="username" required />
+          </div>
+
+          <section class="field-row" style="justify-content: flex-end">
+            <button type="reset">Reset</button>
+            <button type="submit">Submit</button>
+          </section>
+        </form>
+        <p>Items: </p>
+        <p style="color: red">{{error}}</p>
+        <p id="item_list">
+          <ul>
+            {{#items}}
+              <li>
+                <p><strong>Item</strong>: {{item}}</p>
+                <p><strong>Obtained On</strong>: {{obtained_on}}</p>
+              </li>
+            {{/items}}
+          </ul>
+        </p>
+        <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
+      </div>
+    </div>
+  </main>
+</body>
+
+
+</html>

@@ -5,6 +5,7 @@ import { rootRouter } from '../controllers/rootController'
 import cookieParser from 'cookie-parser'
 import { profileRouter } from '../controllers/profileController'
 import { listingRouter } from '../controllers/listingController'
+import { userInvItemsRouter } from '../controllers/uiiController'
 
 export const app = express()
 
@@ -22,3 +23,4 @@ app.use("/auth", authRouter)
 app.use("/", rootRouter)
 app.use("/profile", profileRouter)
 app.use("/listing", listingRouter)
+app.use("/userinventoryitems", userInvItemsRouter)
