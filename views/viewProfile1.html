@@ -1,0 +1,42 @@
+<!--
+* @ Author: Group 1
+* @ Create Time: 2024-09-26 13:33:38
+* @ Modified time: 2024-09-26 13:42:14
+* @ Description:
+-->
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Vapor Community Market</title>
+  <link rel="stylesheet" href="/assets/xp.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+
+<body>
+  <main class="center-container">
+    <div class="window" style="width: 300px">
+      <div class="title-bar">
+        <div class="title-bar-text">View a profile</div>
+        <div class="title-bar-controls">
+          <button aria-label="Close" onclick="location.href='/home'"></button>
+        </div>
+      </div>
+      <div class="window-body">
+        <p>Enter the user's name</p>
+        <p style="color: red">{{error}}</p>
+        <form method="GET" action="/profile">
+          <div class="field-row">
+            <label for="username">Username</label>
+            <input id="username" type="text" name="username" required />
+          </div>
+          <section class="field-row" style="justify-content: flex-end">
+            <button type="submit">Find</button>
+          </section>
+        </form>
+      </div>
+    </div>
+  </main>
+</body>
+
+</html>

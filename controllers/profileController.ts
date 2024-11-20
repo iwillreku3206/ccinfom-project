@@ -10,7 +10,7 @@ profileRouter.get('/update', isLoggedIn, async (req: Request, res: Response) => 
   const user = res.locals.user;
 
   let error = req.query.error?.toString() ?? ''
-  
+
   res.send(mustache.render(await loadTemplate("updateProfile"), {
     username: user?.username,
     displayName: user?.displayName,
@@ -26,4 +26,16 @@ profileRouter.post('/update', isLoggedIn, async (req: Request, res: Response) =>
     return res.redirect("/profile/update?error=" + error)
   }
   return res.redirect("/home")
+})
+
+profileRouter.get("/", isLoggedIn, async (req, res) => {
+  const user = res.locals.user;
+
+  let error = req.query.error?.toString() ?? ''
+
+  res.send(mustache.render(await loadTemplate("viewProfile1"), {
+    username: user?.username,
+    displayName: user?.displayName,
+    error
+  }))
 })
