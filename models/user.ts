@@ -36,6 +36,21 @@ const get_user_by_username_query = `
   WHERE   username = ?
   LIMIT   1;
 `
+export async function getUserByUsername(username: string): Promise<User | null> {
+  const [results, _] = await db.execute<RowDataPacket[]>(`
+    SELECT    id,
+              username,
+              display_name AS displayName,
+              balance,
+              user_type AS userType,
+              password_hash AS passwordHash
+    FROM      users
+    WHERE     username = ?
+    LIMIT     1;
+  `, [username])
+  
+  if (results.length < 1)
+    return null
 
 const get_user_by_session_query = `
   SELECT  u.id AS id,
