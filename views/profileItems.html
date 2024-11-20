@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Vapor Community Market</title>
+  <link rel="stylesheet" href="/assets/xp.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+
+<body>
+  <main class="center-container">
+
+    <div class="window" style="width: 500px">
+      <div class="title-bar">
+        
+        <div class="title-bar-text"><p>{{displayName}} ({{username}})'s items</p></div>
+
+        <div class="title-bar-controls">
+          <button aria-label="Close" onclick="location.href='/'"></button>
+        </div>
+        
+      </div>
+      <div class="window-body">
+        <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
+        <p>Items: </p>
+        <p style="color: red">{{error}}</p>
+        <p id="item_list">
+          <ul>
+            {{#items}}
+              <li>
+                <p><strong>Item</strong>: {{item}}</p>
+                <p><strong>Obtained On</strong>: {{obtained_on}}</p>
+              </li>
+            {{/items}}
+          </ul>
+        </p>
+        
+      </div>
+    </div>
+  </main>
+</body>
+
+
+</html>

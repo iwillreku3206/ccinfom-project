@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Vapor Community Market</title>
+  <link rel="stylesheet" href="/assets/xp.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+
+<body>
+    <main class="center-container">
+        <div class="window" style="width: 300px">
+            <div class="title-bar">
+                <div class="title-bar-text">Add Game</div>
+                <div class="title-bar-controls">
+                    <button aria-label="Close" onclick="location.href='/home'"></button>
+                </div>
+            </div>
+            <div class="window-body" style="background: white">
+                <div class="menu-container">
+                    <p style="color: red">{{error}}</p>
+                    <form method="POST" action="/games/add">
+                        <div class="field-row">
+                            <label for="name">Game Name</label>
+                            <input type="text" id="name" name="name" required />
+                            <label for="description">Game Description</label>
+                            <input type="text" id="description" name="description" required />
+                            <button type="submit">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
+        </div>
+    </main>
+</body> 
+
+</html>

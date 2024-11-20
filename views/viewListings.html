@@ -5,41 +5,6 @@
   <title>Vapor Community Market</title>
   <link rel="stylesheet" href="/assets/xp.css">
   <link rel="stylesheet" href="/assets/styles.css">
-  <style>
-    .menu-container {
-      display: grid;
-      grid-template-columns: repeat(5, 48px);
-      width: min-content;
-      max-width: 100%;
-      gap: 4px;
-      padding: 4px
-    }
-
-    .menu-item {
-      background: none;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 48px;
-      color: black;
-      text-decoration: none;
-      text-align: center;
-    }
-
-    .menu-item:hover {
-      border: none !important;
-      box-shadow: none !important;
-    }
-
-    .menu-icon {
-      width: 32px;
-      height: 32px;
-      image-rendering: pixelated;
-    }
-
-  </style>
 </head>
 
 <body>
@@ -47,6 +12,9 @@
     <div class="window" style="width: 300px">
       <div class="title-bar">
         <div class="title-bar-text">Vapor Market - Listings</div>
+				<div class="title-bar-controls">
+          <button aria-label="Close" onclick="location.href='/home'"></button>
+        </div>
       </div>
       <div class="window-body" style="background: white">
 				<table class="table">
@@ -68,7 +36,7 @@
 					<br>
 					<br>
 					
-					<section class="field-row" style="justify-content: flex-end">
+					<section class="field-row form-buttons" style="justify-content: flex-end">
             <button type="reset">Reset</button>
             <button type="submit">Filter</button>
           </section>

@@ -1,13 +1,13 @@
 import express from 'express'
 import mustache from 'mustache'
 import { loadTemplate } from '../util/loadTemplate'
-import { getUserBySession } from '../models/user'
+import { User } from '../models/user'
 import { isLoggedIn } from './authController'
 
 export const rootRouter = express.Router()
 
 rootRouter.get('/', async (req, res) => {
-  const user = await getUserBySession(req.cookies?.session)
+  const user = (await User.execute('get-by-session', { sessionId: req.cookies?.session || '' }))[0]
   if (user != null) return res.redirect("/home")
   res.send(mustache.render(await loadTemplate("index"), {}))
 })
