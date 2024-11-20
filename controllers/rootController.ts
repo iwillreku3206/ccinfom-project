@@ -13,7 +13,6 @@ rootRouter.get('/', async (req, res) => {
 })
 
 rootRouter.get('/home', isLoggedIn, async (req, res) => {
-  const user = await getUserBySession(req.cookies?.session || '')
-
+  const user = res.locals.user;
   res.send(mustache.render(await loadTemplate("home"), { username: user?.username, displayName: user?.displayName || user?.username }))
 })

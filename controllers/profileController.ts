@@ -7,14 +7,10 @@ import { loadTemplate } from '../util/loadTemplate'
 export const profileRouter = express.Router()
 
 profileRouter.get('/update', isLoggedIn, async (req: Request, res: Response) => {
-  const user = await getUserBySession(req.cookies?.session || '')
+  const user = res.locals.user;
 
-  let error = ""
-
-  if (req.query.error) {
-    error = req.query.error.toString()
-  }
-
+  let error = req.query.error?.toString() ?? ''
+  
   res.send(mustache.render(await loadTemplate("updateProfile"), {
     username: user?.username,
     displayName: user?.displayName,

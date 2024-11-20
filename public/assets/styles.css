@@ -22,7 +22,7 @@ body {
 }
 
 * {
-  font-smooth: never;
+  -webkit-font-smoothing:never;
   -moz-osx-font-smoothing: never;
   -webkit-font-smoothing: never;
 }

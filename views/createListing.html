@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Vapor Community Market</title>
+  <link rel="stylesheet" href="/assets/xp.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    .menu-container {
+      display: grid;
+      grid-template-columns: repeat(5, 48px);
+      width: min-content;
+      max-width: 100%;
+      gap: 4px;
+      padding: 4px
+    }
+
+    .menu-item {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 48px;
+      color: black;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .menu-item:hover {
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    .menu-icon {
+      width: 32px;
+      height: 32px;
+      image-rendering: pixelated;
+    }
+
+  </style>
+</head>
+
+<body>
+  <main class="center-container">
+    <div class="window" style="width: 300px">
+      <div class="title-bar">
+        <div class="title-bar-text">Vapor Market - Listings</div>
+      </div>
+      <div class="window-body" style="background: white">
+				<p>Enter listing details</p>
+				<p style="color: red">{{error}}</p>
+				<form method="POST" action="/listing/post">
+					<div class="field-row">
+						<label for="item">Item Name</label>
+						<input id="item" type="text" name="item" required />
+					</div>
+
+					<div class="field-row">
+						<label for="price">Price</label>
+						<input id="price" type="text" name="price" required />
+					</div>
+
+					<section class="field-row" style="justify-content: flex-end">
+            <button type="reset">Reset</button>
+            <button type="submit">Submit</button>
+          </section>
+				</form>      
+			</div>
+    </div>
+  </main>
+</body>
+
+</html>
