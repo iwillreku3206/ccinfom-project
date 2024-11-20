@@ -38,7 +38,7 @@ export async function getUserByUsername(username: string): Promise<User | null> 
     WHERE     username = ?
     LIMIT     1;
   `, [username])
-
+  
   if (results.length < 1)
     return null
 
