@@ -1,10 +1,10 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
-import { User } from '../models/user'
+import UserModel from '../models/user'
 import mustache from 'mustache'
 import { loadTemplate } from '../util/loadTemplate'
 import argon2 from 'argon2'
 import crypto from 'crypto'
-import { Session } from '../models/session'
+import SessionModel from '../models/session'
 import UAParser from 'ua-parser-js'
 
 export const authRouter = express.Router()
@@ -31,7 +31,7 @@ authRouter.post<{}, {}, { username?: string, password?: string, displayName?: st
 
   try {
     // this can error out
-    await User.execute('create', {
+    await UserModel.instance.createUser({
       username: req.body.username,
       passwordHash,
       displayName: req.body.displayName,
@@ -64,7 +64,7 @@ authRouter.post<{}, {}, { username?: string, password?: string }>('/login', asyn
 
   try {
     // this can error out
-    const user = (await User.execute('get-by-username', { username: req.body.username }))[0]
+    const user = await UserModel.instance.getUserByUsername(req.body.username)
 
     if (!user)
       return res.redirect('/auth/login?error=noaccount')
@@ -75,18 +75,10 @@ authRouter.post<{}, {}, { username?: string, password?: string }>('/login', asyn
     if (!passOk)
       return res.redirect('/auth/login?error=noaccount')
 
-    const id = crypto.randomBytes(32).toString('hex')
-    const expiry = new Date((new Date()).getTime() + 1000 * 60 * 60 * 24 * 30)
-    const userAgent = new UAParser(req.headers['user-agent'] || '')
+    const userAgent = req.headers['user-agent'] || ''
 
     // password is ok, we create the session
-    await Session.execute('create', { 
-      id, expiry, 
-      userId: user.id, 
-      session: id,
-      browser: userAgent.getBrowser().name || '',
-      platform: userAgent.getOS().name || '' 
-    })
+    const { id, expiry } = await SessionModel.instance.createSession(user.id, userAgent)
 
     return res.cookie("session", id, {
       httpOnly: true,
@@ -98,16 +90,13 @@ authRouter.post<{}, {}, { username?: string, password?: string }>('/login', asyn
 })
 
 authRouter.post('/logout', async (req, res) => {
-  await Session.execute('expire', { id: req.cookies?.session })
+  await SessionModel.instance.expireSession(req.cookies?.session || '')
   res.clearCookie("session").redirect("/")
 })
 
 authRouter.post('/password/update', isLoggedIn, async (req, res) => {
-
-  const passwordHash = await argon2.hash(req.body.password)
-
   try {
-    await User.execute('update-password-by-session', { sessionId: req.cookies.session, passwordHash });
+    await UserModel.instance.updatePasswordBySession(req.cookies.session, req.body.password);
   } catch (error) {
     return res.redirect("/profile/update?error=" + error)
   }
@@ -116,9 +105,9 @@ authRouter.post('/password/update', isLoggedIn, async (req, res) => {
 
 
 export async function isLoggedIn(req: Request, res: Response, next: NextFunction) {
-  const user = (await User.execute('get-by-session', { sessionId: req.cookies?.session || '' }))[0]
+  const user = await UserModel.instance.getUserBySession(req.cookies.session)
   if (!user) return res.clearCookie('session').redirect('/')
-  
+
   // Save the user here so we don't have to find it each time
   res.locals.user = user;
   res.locals.error = req.query.error?.toString() ?? '';
