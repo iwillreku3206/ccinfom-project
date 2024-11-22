@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-16 11:34:48
- * @ Modified time: 2024-11-23 04:11:41
+ * @ Modified time: 2024-11-23 04:14:52
  * @ Description:
  * 
  * A controller for the listings-related pages and functionality.
@@ -41,15 +41,15 @@ listingRouter.get('/view', async (req, res) => {
  * Grabs the listings associated with the user.
  */
 listingRouter.post('/view', async (req, res) => {
-  const { user, error } = res.locals;
+  const { user, model, error } = res.locals;
   const { item, seller, price, date } = req.body;
 
   // const listings = await (() => (
-  //   item?.length ? Listing.execute('get-by-item', { item: parseInt(item) })
-  //     : seller?.length ? Listing.execute('get-by-seller', { seller: parseInt(seller) })
-  //       // : price?.length   ? Listing.getListings('price', parseFloat(price)) 
-  //       // : date?.length    ? Listing.getListings('list_date', date)
-  //       : Listing.execute('get-all')
+  //     item?.length ? Listing.execute('get-by-item', { item: parseInt(item) })
+  //   : seller?.length ? Listing.execute('get-by-seller', { seller: parseInt(seller) })
+  //   : price?.length   ? Listing.getListings('price', parseFloat(price)) 
+  //   : date?.length    ? Listing.getListings('list_date', date)
+  //   : await model.getAllListings()
   // ))()
   const listingData = JSON.stringify([])
   render(res, 'viewListings', { listingData, error })
