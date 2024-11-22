@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-16 11:34:48
- * @ Modified time: 2024-11-23 01:51:19
+ * @ Modified time: 2024-11-23 03:09:32
  * @ Description:
  * 
  * A controller for the listings-related pages and functionality.
@@ -10,11 +10,17 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
 import mustache from 'mustache'
 import { loadTemplate } from '../util/loadTemplate'
-import { isLoggedIn } from './authController'
+import { isLoggedIn } from './plugins'
 import ListingModel from '../models/listing';
 
 // The router to use
 export const listingRouter = express.Router()
+
+// Specify the model to use
+listingRouter.use((req, res, next) => (
+  res.locals.model = ListingModel.instance,
+  next()
+))
 
 /**
  * The page for the create listing form.
@@ -50,8 +56,6 @@ listingRouter.post('/list', isLoggedIn, async (req: Request, res: Response) => {
   // ))()
   const listingData = JSON.stringify([])
 
-  console.log(listingData)
-
   res.send(mustache.render(await loadTemplate("viewListings"), { listingData, error }))
 })
 
@@ -59,13 +63,13 @@ listingRouter.post('/list', isLoggedIn, async (req: Request, res: Response) => {
  * A request for posting a new listing in the database.
  */
 listingRouter.post('/post', isLoggedIn, async (req: Request, res: Response) => {
-  const { user, error } = res.locals;
+  const { user, model, error } = res.locals;
 
   // ! todo, search for item in item database
   // ! then create listing
   // ! remove random price lmao
 
-  ListingModel.instance.createListing({ item: 1, price: Math.random() * 1000, seller: user.id })
+  model.createListing({ item: 1, price: Math.random() * 1000, seller: user.id })
     .then(() => res.redirect('/home'))
     .catch((error: Error) => res.status(500).redirect('/listing/create?error=' + error))
 })

@@ -1,5 +1,5 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
-import { createErrorHandler, isLoggedIn } from './authController'
+import { createErrorHandler, isLoggedIn } from './plugins'
 import UserModel from '../models/user'
 import mustache from 'mustache'
 import { loadTemplate } from '../util/loadTemplate'

@@ -1,6 +1,6 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
 import { getInventoryItemByUserId } from '../models/userInventoryItems'
-import { isLoggedIn } from './authController'
+import { isLoggedIn } from './plugins'
 import mustache from 'mustache'
 import { loadTemplate } from '../util/loadTemplate'
 import argon2 from 'argon2'

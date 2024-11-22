@@ -2,7 +2,7 @@ import express from 'express'
 import mustache from 'mustache'
 import { loadTemplate } from '../util/loadTemplate'
 import UserModel from '../models/user'
-import { isLoggedIn } from './authController'
+import { isLoggedIn } from './plugins'
 
 export const rootRouter = express.Router()
 

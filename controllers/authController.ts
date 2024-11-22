@@ -3,22 +3,29 @@ import UserModel from '../models/user'
 import mustache from 'mustache'
 import { loadTemplate } from '../util/loadTemplate'
 import argon2 from 'argon2'
-import crypto from 'crypto'
 import SessionModel from '../models/session'
-import UAParser from 'ua-parser-js'
-import log from 'log'
+import { isLoggedIn, createErrorHandler } from './plugins'
 
 export const authRouter = express.Router()
 
-authRouter.get('/register', async (req, res) => {
-  // allows errors to show up on page
-  let viewOpts = { error: '' }
-  if (req.query.error == "missingfields") {
-    viewOpts.error = `Error: Please ensure you have a username and password`
-  } else if (req.query.error) {
-    viewOpts.error = req.query.error.toString()
-  }
-  res.send(mustache.render(await loadTemplate("register"), viewOpts))
+const authErrorHandler = createErrorHandler(new Map([
+  [ 'missingfields', 'Please ensure you have a username and password.' ],
+  [ 'noaccount', 'Incorrect username/password' ]
+]))
+
+authRouter.get('/register', authErrorHandler, async (req, res) => {
+  const { error } = res.locals;
+  res.send(mustache.render(await loadTemplate("register"), { error }))
+})
+
+authRouter.get('/login', authErrorHandler, async (req, res) => {
+  const { error } = res.locals;
+  res.send(mustache.render(await loadTemplate("login"), { error }))
+})
+
+authRouter.post('/logout', async (req, res) => {
+  await SessionModel.instance.expireSession(req.cookies?.session || '')
+  res.clearCookie("session").redirect("/")
 })
 
 authRouter.post<{}, {}, { username?: string, password?: string, displayName?: string }>('/register', async (req, res) => {
@@ -42,21 +49,6 @@ authRouter.post<{}, {}, { username?: string, password?: string, displayName?: st
   } catch (error) {
     return res.status(500).redirect("/auth/register?error=" + error)
   }
-})
-
-authRouter.get('/login', async (req, res) => {
-  let viewOpts = { error: '' }
-
-  // allows errors to be shown on the page
-  if (req.query.error == "missingfields") {
-    viewOpts.error = `Error: Please ensure you have a username and password`
-  } else if (req.query.error == "noaccount") {
-    viewOpts.error = `Error: Incorrect username/password`
-  } else if (req.query.error) {
-    viewOpts.error = req.query.error.toString()
-  }
-
-  res.send(mustache.render(await loadTemplate("login"), viewOpts))
 })
 
 authRouter.post<{}, {}, { username?: string, password?: string }>('/login', async (req, res) => {
@@ -90,11 +82,6 @@ authRouter.post<{}, {}, { username?: string, password?: string }>('/login', asyn
   }
 })
 
-authRouter.post('/logout', async (req, res) => {
-  await SessionModel.instance.expireSession(req.cookies?.session || '')
-  res.clearCookie("session").redirect("/")
-})
-
 authRouter.post('/password/update', isLoggedIn, async (req, res) => {
   try {
     await UserModel.instance.updatePasswordBySession(req.cookies.session, req.body.password);
@@ -103,51 +90,3 @@ authRouter.post('/password/update', isLoggedIn, async (req, res) => {
   }
   return res.redirect("/home")
 })
-
-
-export async function isLoggedIn(req: Request, res: Response, next: NextFunction) {
-  const user = await UserModel.instance.getUserBySession(req.cookies.session)
-  if (!user) return res.clearCookie('session').redirect('/')
-
-  // Save the user here so we don't have to find it each time
-  res.locals.user = user;
-  res.locals.error = req.query.error?.toString() ?? '';
-  next()
-}
-
-/**
- * Creates a new function that returns an error handler.
- * See gameController.ts or listingController.ts for more info on how to use.
- *  
- * @param descriptions  The descriptions of each error to handle.
- * @returns             An error handling middleware func. 
- */
-export const createErrorHandler = (descriptions: Map<string, string>) => (
-
-  // Create a new middleware that handles translating error keys to error messages 
-  (req: Request, res: Response, next: NextFunction) => (
-    
-    // For each description, replace error key with it
-    res.locals?.error && 
-      descriptions.forEach(
-        (description: string, error: string) => (
-          res.locals.error = 
-          res.locals.error.replace(error, description))),
-    
-    // Call next middleware
-    next()
-  )
-)
-
-export function isAdmin(callback: string) {
-  return async (_: Request, res: Response, next: NextFunction) => {
-    if (!res.locals.user) log.error("Run isLoggedIn first!")
-
-    console.log("type", res.locals.user)
-    if (res.locals.user.userType === 'admin') {
-      return next()
-    } else {
-      return res.redirect(`${callback}?error=unauthorized`)
-    }
-  }
-}
