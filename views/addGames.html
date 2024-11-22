@@ -16,20 +16,24 @@
                     <button aria-label="Close" onclick="location.href='/home'"></button>
                 </div>
             </div>
-            <div class="window-body" style="background: white">
-                <div class="menu-container">
-                    <p style="color: red">{{error}}</p>
+            <div class="window-body">
+                <fieldset>
+                    <legend>Specify the game details</legend>
                     <form method="POST" action="/games/add">
                         <div class="field-row">
                             <label for="name">Game Name</label>
                             <input type="text" id="name" name="name" required />
+                        </div>
+                        <div class="field-row">
                             <label for="description">Game Description</label>
                             <input type="text" id="description" name="description" required />
+                        </div>
+                        <div class="field-row form-buttons">
                             <button type="submit">Add</button>
                         </div>
                     </form>
+                </fieldset>
                 </div>
-            </div>
             <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
         </div>
     </main>

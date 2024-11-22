@@ -3,7 +3,7 @@ import { isLoggedIn } from './authController'
 import UserModel from '../models/user'
 import mustache from 'mustache'
 import { loadTemplate } from '../util/loadTemplate'
-import { createGame } from '../models/games'
+import { GameModel } from '../models/game'
 
 export const gamesRouter = express.Router()
 
@@ -39,8 +39,10 @@ gamesRouter.get('/add', isLoggedIn, async (req: Request, res: Response) => {
 })
 
 gamesRouter.post('/add', isLoggedIn, async (req: Request, res: Response) => {
+  const gameModel = GameModel.instance
+
   try {
-    await createGame({ name: req.body.name, description: req.body.description })
+    await gameModel.createGame({ name: req.body.name, description: req.body.description })
   } catch (error) {
     res.redirect("/games/add?error=" + error)
   }

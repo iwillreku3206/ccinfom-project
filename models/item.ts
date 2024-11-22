@@ -3,15 +3,15 @@ import { db } from "../app/database"
 import Model, { type SQLValueList } from "./model"
 import log from "log"
 
-export interface IItems {
+export interface IItem {
     id: number,
     name: string,
     description: string,
     game: number
 }
 
-type create_item_spec = Omit<IItems, 'id'>
-type get_item_by_name_spec = Pick<IItems, 'name'>
+type create_item_spec = Omit<IItem, 'id'>
+type get_item_by_name_spec = Pick<IItem, 'name'>
 type get_items_by_game_spec = {gameId: number}
 
 const create_item_query = `
@@ -74,7 +74,7 @@ export default class ItemModel extends Model {
         await super.execute('create', item as SQLValueList)
     }
 
-    public async getItemByName(itemName: string): Promise<IItems | null> {
+    public async getItemByName(itemName: string): Promise<IItem | null> {
         const results = await super.execute<RowDataPacket[]>("get-by-name", {itemName})
     
         if (results.length < 1) {
@@ -86,16 +86,16 @@ export default class ItemModel extends Model {
             return null
         }
 
-        return results[0] as IItems
+        return results[0] as IItem
     }
 
-    public async getItemsByGame(gameName: string): Promise<IItems | null> {
+    public async getItemsByGame(gameName: string): Promise<IItem | null> {
         const results = await super.execute<RowDataPacket[]>("get-by-game", {gameName})
 
         if (results.length < 1) {
             return null
         }
 
-        return results[0] as IItems
+        return results[0] as IItem
     }
 }
