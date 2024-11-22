@@ -5,6 +5,8 @@
   <title>Vapor Community Market</title>
   <link rel="stylesheet" href="/assets/xp.css">
   <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/assets/datepicker.css">
+  <link rel="stylesheet" href="/assets/datepicker.js">
 </head>
 
 <body>
@@ -24,14 +26,23 @@
 						<label for="item">Filter by item</label>
 						<input type="text" name="item" id="item" placeholder="none" value="">
 						
-						<label for="item">Filter by seller</label>
+						<label for="seller">Filter by seller</label>
 						<input type="text" name="seller" id="seller" placeholder="none" value="">
 						
-						<label for="item">Filter by price</label>
-						<input type="text" name="price" id="price" placeholder="none" value="">
+						<label>Price</label>
+						<input type="text" name="pricemin" id="pricemin" placeholder="0" value="" style="width:20%"></input>
+						-
+						<input type="text" name="pricemax" id="pricemax" placeholder="INF" value="" style="width:20%"></input>
 	
-						<label for="item">Filter by date</label>
-						<input type="text" name="date" id="date" placeholder="none" value="">
+						<label>Date</label>
+						<input type="text" id="visual-datemin" placeholder="start" style="width:20%"></input>
+						-
+						<input type="text" id="visual-datemax" placeholder="end" style="width:20%"></input>
+
+						<!-- Hidden fields for actual values -->
+						<input type="text" name="datemin" id="datemin" placeholder="start" style="width:20%; display: none;"></input>
+						<input type="text" name="datemax" id="datemax" placeholder="end" style="width:20%; display: none;"></input>
+
 						<br>
 						<br>
 						
@@ -55,23 +66,27 @@
   </main>
 
 	<script src="/assets/utils.js"></script>
-	<script>
+	<script type="module">
+
+		import '/assets/datepicker.js'
+
+		// Create date picker
+		const visual_datemin = DOM.select('#visual-datemin')
+		const visual_datemax = DOM.select('#visual-datemax')
+
+		const datemin = DOM.select('#datemin')
+		const datemax = DOM.select('#datemax')
+		
+		const date_start_picker = datepicker(visual_datemin, { 
+			onSelect: () => (datemin.value = new Date(visual_datemin.value).getTime())
+		})
+		const date_end_picker = datepicker(visual_datemax, { 
+			onSelect: () => (datemax.value = new Date(visual_datemax.value).getTime())  
+		})
 
 		// DOM stuff we'll use
 		const listings = JSON.parse('{{{listingData}}}');
 		const table = DOM.select('.table')
-
-		<!-- ! dummy data -->
-		// ! remove
-		// Populate listings with dummy data
-		for(let i = 0; i < 10; i++) {
-			listings.push({
-				id: i,
-				item: ~~(Math.random() * 100),
-				price: Math.random() * 10 + 10,
-				seller: ~~(Math.random() * 100)
-			})
-		}
 
 		// The new elements we'll use
 		const button = () => DOM.element('button')

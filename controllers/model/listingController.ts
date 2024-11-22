@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-16 11:34:48
- * @ Modified time: 2024-11-23 04:14:52
+ * @ Modified time: 2024-11-23 05:03:51
  * @ Description:
  * 
  * A controller for the listings-related pages and functionality.
@@ -42,15 +42,28 @@ listingRouter.get('/view', async (req, res) => {
  */
 listingRouter.post('/view', async (req, res) => {
   const { user, model, error } = res.locals;
-  const { item, seller, price, date } = req.body;
+  let { item, seller, pricemin, pricemax, datemin, datemax } = req.body;
 
-  // const listings = await (() => (
-  //     item?.length ? Listing.execute('get-by-item', { item: parseInt(item) })
-  //   : seller?.length ? Listing.execute('get-by-seller', { seller: parseInt(seller) })
-  //   : price?.length   ? Listing.getListings('price', parseFloat(price)) 
-  //   : date?.length    ? Listing.getListings('list_date', date)
-  //   : await model.getAllListings()
-  // ))()
+  // Set the bounds if at least one defined
+  if(pricemin?.length || pricemax?.length) {
+    pricemin = pricemin?.length ? pricemin : '0'
+    pricemax = pricemax?.length ? pricemax : (1e20).toString()
+  }
+
+  // Set the bounds if at least one defined
+  if(datemin?.length || datemax?.length) {
+    datemin = datemin?.length ? datemin : '0'
+    datemax = datemax?.length ? datemax : (1e20).toString()
+  }
+
+  // Grab listings then render
+  const listings = await (() => (
+      item?.length        ? model.getFilteredListings('item', parseInt(item))
+    : seller?.length      ? model.getFilteredListings('seller', parseInt(seller))
+    : pricemin?.length    ? model.getFilteredListings('price', parseFloat(pricemin), parseFloat(pricemax)) 
+    : datemin?.length     ? model.getFilteredListings('list_date', parseInt(datemin), parseInt(datemax))
+    : model.getAllListings()
+  ))()
   const listingData = JSON.stringify([])
   render(res, 'viewListings', { listingData, error })
 })

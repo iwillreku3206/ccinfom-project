@@ -42,8 +42,6 @@ gameRouter.post('/view', async(req: Request, res: Response) => {
     ? await model.getAllGames()
     : [ await model.getGame({ name }) ]
   const gameData = JSON.stringify(games)
-
-  console.log(name, ' + ', games)
   render(res, 'viewGames', { gameData, error })
 }) 
 
