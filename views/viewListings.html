@@ -53,7 +53,20 @@
 		const listings = JSON.parse('{{{listingData}}}');
 		const table = DOM.select('.table')
 
+		<!-- ! dummy data -->
+		// ! remove
+		// Populate listings with dummy data
+		for(let i = 0; i < 10; i++) {
+			listings.push({
+				id: i,
+				item: ~~(Math.random() * 100),
+				price: Math.random() * 10 + 10,
+				seller: ~~(Math.random() * 100)
+			})
+		}
+
 		// The new elements we'll use
+		const button = () => DOM.element('button')
 		const tr = () => DOM.element('tr')
 		const td = () => DOM.element('td')
 		const th = () => DOM.element('th')
@@ -66,6 +79,7 @@
 				th().text('Item ID'),
 				th().text('Price'),
 				th().text('Seller ID'),
+				th()
 			)
 		)
 
@@ -78,9 +92,12 @@
 				td().text(listing.item),
 				td().text(listing.price),
 				td().text(listing.seller),
+				td().append(button().stl({ color: 'red' }).text('delete')),
 				br()
 			)
 		)
+
+		listings.map(listing_mapper).map(e => table.append(e))
 	</script>
 </body>
 
