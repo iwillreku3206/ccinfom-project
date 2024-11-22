@@ -46,67 +46,41 @@
     </div>
   </main>
 
+	<script src="/assets/utils.js"></script>
 	<script>
-		(() => {
 
-			// Helper func
-			const fluent = (element) => Object.assign(element, {
-				
-				// Append children to the element
-				append: (...children) => 
-					(children.map(child => element.appendChild(child)), element),
+		// DOM stuff we'll use
+		const listings = JSON.parse('{{{listingData}}}');
+		const table = DOM.select('.table')
 
-				// Sets the text content of the element
-				text: (text) => (
-					text 
-						? (element.textContent = text, element)
-						: (element.outerHTML) 
-				),
-					
-				// Sets the class names of the element
-				class: (...classes) => (
-					classes.length 
-						? (classes.map(c => element.classList.add(c)), element)
-						: (element.classList)
-				)
-			})
+		// The new elements we'll use
+		const tr = () => DOM.element('tr')
+		const td = () => DOM.element('td')
+		const th = () => DOM.element('th')
+		const br = () => DOM.element('br')
 
-			// DOM stuff we'll use
-			const listings = JSON.parse('{{{listingData}}}');
-			const table = fluent(document.querySelector('.table'))
-
-			// The new elements we'll use
-			const tr = () => fluent(document.createElement('tr'))
-			const td = () => fluent(document.createElement('td'))
-			const th = () => fluent(document.createElement('th'))
-			const br = () => fluent(document.createElement('br'))
-
-			// Adds the headers of the table
-			table.append(
-				tr().append(
-					th().text('Listing ID'),
-					th().text('Item ID'),
-					th().text('Price'),
-					th().text('Seller ID'),
-				)
+		// Adds the headers of the table
+		table.append(
+			tr().append(
+				th().text('Listing ID'),
+				th().text('Item ID'),
+				th().text('Price'),
+				th().text('Seller ID'),
 			)
+		)
 
-			/**
-			 * Maps each listing to a table row.
-			 */
-			const listing_mapper = (listing) => (
-				tr().class('table-row').append(
-					td().text(listing.id),
-					td().text(listing.item),
-					td().text(listing.price),
-					td().text(listing.seller),
-					br()
-				)
+		/**
+			* Maps each listing to a table row.
+			*/
+		const listing_mapper = (listing) => (
+			tr().class('table-row').append(
+				td().text(listing.id),
+				td().text(listing.item),
+				td().text(listing.price),
+				td().text(listing.seller),
+				br()
 			)
-
-			// Generate the table
-			listings.map((listing) => table.appendChild(listing_mapper(listing)))
-		})()
+		)
 	</script>
 </body>
 
