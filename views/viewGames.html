@@ -21,8 +21,8 @@
 					<fieldset>
 						<legend>Enter search terms</legend>
 						<form method="POST" action="/games/view">
-							<label for="item">Search by name</label>
-							<input type="text" name="item" id="item" placeholder="none" value="">
+							<label for="name">Search by name</label>
+							<input type="text" name="name" id="name" placeholder="none" value="">
 							<br>
 							<br>
 							
@@ -50,16 +50,6 @@
 			// DOM stuff we'll use
 			const games = JSON.parse('{{{gameData}}}');
 			const table = DOM.select('.table')
-
-			<!-- ! dummy data -->
-			// ! remove
-			// Populate games with dummy data
-			for(let i = 0; i < 10; i++) {
-				games.push({
-					name: Math.random().toString(),
-					description: Math.random().toString(),
-				})
-			}
 
 			// The new elements we'll use
 			const button = () => DOM.element('button')

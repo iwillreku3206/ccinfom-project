@@ -33,6 +33,20 @@ gameRouter.get('/view', async (req: Request, res: Response) => {
   })
 })
 
+gameRouter.post('/view', async(req: Request, res: Response) => {
+  const { user, model, error } = res.locals;
+  const { name } = req.body;
+
+  // Grab the games then render
+  const games = name.trim() == ''
+    ? await model.getAllGames()
+    : [ await model.getGame({ name }) ]
+  const gameData = JSON.stringify(games)
+
+  console.log(name, ' + ', games)
+  render(res, 'viewGames', { gameData, error })
+}) 
+
 gameRouter.get('/add', async (req: Request, res: Response) => {
   const { user, model, error } = res.locals;
 
