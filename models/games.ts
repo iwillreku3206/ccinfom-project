@@ -1,60 +1,90 @@
 import { type RowDataPacket, type ResultSetHeader } from "mysql2"
 import { db } from "../app/database"
+import Model, { type SQLValueList } from "./model"
 import log from "log"
 
-export interface Games {
+export interface IGames {
     id: number,
     name: string,
     description: string
 }
 
-export async function createGame(game: Omit<Games, 'id'>): Promise<Games> {
-    const [results, _] = await db.execute<ResultSetHeader>(
-        `INSERT INTO \`games\` (name, description) VALUES (?, ?);`
-        , [game.name, game.description]
-    )
+type create_game_spec = Omit<IGames, 'id'>
+type get_game_by_name_spec = Pick<IGames, 'name'> 
+
+const create_game_query = `
+    INSERT INTO \`games\` 
+    (name, description) 
+    VALUES (?, ?);
+`
+
+const get_game_by_name_query = `
+    SELECT      id,
+                name,
+                description
+    FROM        \`games\`
+    WHERE       name = ?
+    LIMIT       1;
+`
+
+const get_all_games_query = `
+    SELECT      id,
+                name,
+                description
+    FROM        \`games\`;
+`
+
+export default class GamesModel extends Model {
+    static #instance: GamesModel
+
+    public static get instance(): GamesModel {
+        if (!GamesModel.#instance) {
+            GamesModel.#instance = new GamesModel()
+        }
+        
+        return GamesModel.#instance
+    }
+
+    private constructor() {
+        super()
+
+        super
+            .register('create', create_game_query, game => [game.name, game.description])
+        super
+            .register('get-by-name', get_game_by_name_query, game => [game.name])
+    }
+
+    public async createGame(game: create_game_spec) {
+        await super.execute('create', game as SQLValueList)
+    }
+
+    public async getGameByName(gameName: string): Promise<IGames | null> {
+        const results = await super.execute<RowDataPacket[]>('get-by-name', { gameName })
     
-    return {
-    id: results.insertId,
-    ...game,
+        if (results.length < 1) {
+            return null
+        }
+    
+        if (!results[0].id || !results[0].name || !results[0].description) {
+            log.error("Invalid game: ", JSON.stringify(results[0]))
+            return null
+        }
+        return results[0] as IGames
     }
 }
 
-export async function getGameByName(gameName: string): Promise<Games | null> {
-    const [results, _] = await db.execute<RowDataPacket[]>(
-        `SELECT     id,
-                    name,
-                    description
-        FROM        games
-        WHERE       name = ?
-        LIMIT       1;`
-        , [gameName]
-    )
+// export async function getAllGames(): Promise<Games | null> {
+//     const [results, _] = await db.execute<RowDataPacket[]>(
+//         `SELECT     id,
+//                     name,
+//                     description
+//         FROM        games`
+//     )
 
-    if (results.length < 1) {
-        log.error("no game")
-        return null
-    }
+//     if (results.length < 1) {
+//         log.error("no games available")
+//         return null
+//     }
 
-    if (!results[0].id || !results[0].name || !results[0].description) {
-        log.error("invalid game")
-        return null
-    }
-    return results[0] as Games
-}
-
-export async function getAllGames(): Promise<Games | null> {
-    const [results, _] = await db.execute<RowDataPacket[]>(
-        `SELECT     id,
-                    name,
-                    description
-        FROM        games`
-    )
-
-    if (results.length < 1) {
-        log.error("no games available")
-        return null
-    }
-
-    return results[0] as Games
-}
+//     return results[0] as Games
+// }
