@@ -1,48 +1,61 @@
-import express, { type Request, type Response } from 'express'
-import { isLoggedIn } from './authController'
+import express, { type NextFunction, type Request, type Response } from 'express'
+import { createErrorHandler, isLoggedIn } from './authController'
 import UserModel from '../models/user'
 import mustache from 'mustache'
 import { loadTemplate } from '../util/loadTemplate'
 import { GameModel } from '../models/game'
 
-export const gamesRouter = express.Router()
+export const gameRouter = express.Router()
 
-gamesRouter.get('/', isLoggedIn, async (req: Request, res: Response) => {
-  const user = await UserModel.instance.getUserBySession(req.cookies?.session || '')
+// Handles error
+const gameRouterErrorHandler = createErrorHandler(new Map([
+  [ 'adminsonly', 'Only admins can create new games.' ]
+]))
+
+// Specify model to use
+gameRouter.use((req, res, next) => (
+  res.locals.model = GameModel.instance,
+  next()
+))
+
+gameRouter.get('/', isLoggedIn, gameRouterErrorHandler, async (req: Request, res: Response) => {
+  const { user, model, error } = res.locals;
 
   res.send(mustache.render(await loadTemplate("games"), {
-    username: user?.username, displayName: user?.displayName || user?.username
+    username: user?.username, 
+    displayName: user?.displayName || user?.username,
+    error
   }))
 })
 
-gamesRouter.get('/view', isLoggedIn, async (req: Request, res: Response) => {
-  const user = await UserModel.instance.getUserBySession(req.cookies?.session || '')
+gameRouter.get('/view', isLoggedIn, gameRouterErrorHandler, async (req: Request, res: Response) => {
+  const { user, model, error } = res.locals;
 
   res.send(mustache.render(await loadTemplate("viewGames"), {
-    username: user?.username, displayName: user?.displayName || user?.username
+    username: user?.username, 
+    displayName: user?.displayName || user?.username,
+    error
   }))
 })
 
-gamesRouter.get('/add', isLoggedIn, async (req: Request, res: Response) => {
-  const user = await UserModel.instance.getUserBySession(req.cookies?.session || '')
+gameRouter.get('/add', isLoggedIn, gameRouterErrorHandler, async (req: Request, res: Response) => {
+  const { user, model, error } = res.locals;
 
-  let error = ""
-
-  if (user?.userType == 'basic') {
-    error = "Error: Only admin accounts can access"
-    return res.redirect("/games?error=" + error)
-  }
+  if (user?.userType == 'basic')
+    return res.redirect('/games?error=adminsonly')
 
   res.send(mustache.render(await loadTemplate("addGames"), {
-    username: user?.username, displayName: user?.displayName || user?.username
+    username: user?.username, 
+    displayName: user?.displayName || user?.username,
+    error
   }))
 })
 
-gamesRouter.post('/add', isLoggedIn, async (req: Request, res: Response) => {
-  const gameModel = GameModel.instance
-
+gameRouter.post('/add', isLoggedIn, gameRouterErrorHandler, async (req: Request, res: Response) => {
+  const { user, model, error } = res.locals;
+  
   try {
-    await gameModel.createGame({ name: req.body.name, description: req.body.description })
+    await model.createGame({ name: req.body.name, description: req.body.description })
   } catch (error) {
     res.redirect("/games/add?error=" + error)
   }

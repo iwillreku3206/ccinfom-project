@@ -115,6 +115,30 @@ export async function isLoggedIn(req: Request, res: Response, next: NextFunction
   next()
 }
 
+/**
+ * Creates a new function that returns an error handler.
+ * See gameController.ts or listingController.ts for more info on how to use.
+ *  
+ * @param descriptions  The descriptions of each error to handle.
+ * @returns             An error handling middleware func. 
+ */
+export const createErrorHandler = (descriptions: Map<string, string>) => (
+
+  // Create a new middleware that handles translating error keys to error messages 
+  (req: Request, res: Response, next: NextFunction) => (
+    
+    // For each description, replace error key with it
+    res.locals?.error && 
+      descriptions.forEach(
+        (description: string, error: string) => (
+          res.locals.error = 
+          res.locals.error.replace(error, description))),
+    
+    // Call next middleware
+    next()
+  )
+)
+
 export function isAdmin(callback: string) {
   return async (_: Request, res: Response, next: NextFunction) => {
     if (!res.locals.user) log.error("Run isLoggedIn first!")
