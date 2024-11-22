@@ -17,7 +17,6 @@
         </div>
       </div>
       <div class="window-body">
-        <p style="color: red">{{error}}</p>
         <div class="field-row">
           <fieldset>
             <legend>Update your profile</legend>
@@ -26,7 +25,10 @@
               <input type="text" name="username" id=" username" value="{{username}}" />
               <label for="displayName">Display Name: </label>
               <input type="text" name="displayName" id="displayName" value="{{displayName}}">
-              <button type="submit">Update</button>
+
+              <section class="field-row form-buttons">
+                <button type="submit">Update</button>
+              </section>
             </form>
           </fieldset>
         </div>
@@ -36,10 +38,14 @@
             <form action="/auth/password/update" method="post">
               <label for="password">Password: </label>
               <input type="password" name="password" id="password" />
-              <button type="submit">Update</button>
+
+              <section class="field-row form-buttons">
+                <button type="submit">Update</button>
+              </section>
             </form>
           </fieldset>
         </div>
+        <p class="error">{{error}}</p>
       </div>
       <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
     </div>

@@ -12,26 +12,31 @@
     <div class="window" style="width: 300px">
       <div class="title-bar">
         <div class="title-bar-text">Vapor Market - Listings</div>
+				<div class="title-bar-controls">
+          <button aria-label="Close" onclick="location.href='/home'"></button>
+        </div>
       </div>
       <div class="window-body" style="background: white">
-				<p>Enter listing details</p>
-				<p style="color: red">{{error}}</p>
-				<form method="POST" action="/listing/post">
-					<div class="field-row">
-						<label for="item">Item Name</label>
-						<input id="item" type="text" name="item" required />
-					</div>
+				<fieldset>
+					<legend>Enter listing details</legend>
+					<form method="POST" action="/listing/post">
+						<div class="field-row">
+							<label for="item">Item Name</label>
+							<input id="item" type="text" name="item" required />
+						</div>
 
-					<div class="field-row">
-						<label for="price">Price</label>
-						<input id="price" type="text" name="price" required />
-					</div>
+						<div class="field-row">
+							<label for="price">Price</label>
+							<input id="price" type="text" name="price" required />
+						</div>
 
-					<section class="field-row form-buttons" style="justify-content: flex-end">
-            <button type="reset">Reset</button>
-            <button type="submit">Submit</button>
-          </section>
-				</form>      
+						<section class="field-row form-buttons">
+							<button type="reset">Reset</button>
+							<button type="submit">Submit</button>
+						</section>
+					</form>
+					<p class="error">{{error}}</p>
+				</fieldset>      
 			</div>
     </div>
   </main>
