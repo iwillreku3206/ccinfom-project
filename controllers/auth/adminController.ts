@@ -1,8 +1,8 @@
 import express, { type Request, type Response } from 'express'
-import { isAdmin, isLoggedIn } from './plugins'
+import { isAdmin, isLoggedIn } from '../../util/plugins'
 import mustache from 'mustache'
-import UserModel from '../models/user'
-import { loadTemplate } from '../util/loadTemplate'
+import UserModel from '../../models/user'
+import { loadTemplate } from '../../util/loadTemplate'
 
 export const adminRouter = express.Router()
 

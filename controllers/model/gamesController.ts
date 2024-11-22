@@ -1,8 +1,8 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
-import { errorHandler, isLoggedIn, modelHandler } from './plugins'
+import { errorHandler, isLoggedIn, modelHandler } from '../../util/plugins'
 import mustache from 'mustache'
-import { loadTemplate } from '../util/loadTemplate'
-import { GameModel } from '../models/game'
+import { GameModel } from '../../models/game'
+import { loadTemplate } from '../../util/loadTemplate'
 
 export const gameRouter = express.Router()
 

@@ -1,11 +1,11 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
-import { getInventoryItemByUserId } from '../models/userInventoryItems'
-import { isLoggedIn } from './plugins'
+import { getInventoryItemByUserId } from '../../models/userInventoryItems'
+import { isLoggedIn } from '../../util/plugins'
 import mustache from 'mustache'
-import { loadTemplate } from '../util/loadTemplate'
+import { loadTemplate } from '../../util/loadTemplate'
 import argon2 from 'argon2'
-import SessionModel from '../models/session'
-import UserModel from '../models/user'
+import SessionModel from '../../models/session'
+import UserModel from '../../models/user'
 
 
 const pageRender = async (res: Response, templateName: string, viewOpts: {}) => res.send(mustache.render(await loadTemplate(templateName), viewOpts))

@@ -1,10 +1,10 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
-import UserModel from '../models/user'
+import UserModel from '../../models/user'
 import mustache from 'mustache'
-import { loadTemplate } from '../util/loadTemplate'
+import { loadTemplate } from '../../util/loadTemplate'
 import argon2 from 'argon2'
-import SessionModel from '../models/session'
-import { isLoggedIn, errorHandler } from './plugins'
+import SessionModel from '../../models/session'
+import { isLoggedIn, errorHandler } from '../../util/plugins'
 
 export const authRouter = express.Router()
 

@@ -9,9 +9,9 @@
 
 import express, { type NextFunction, type Request, type Response } from 'express'
 import mustache from 'mustache'
-import { loadTemplate } from '../util/loadTemplate'
-import { errorHandler, isLoggedIn, modelHandler } from './plugins'
-import ListingModel from '../models/listing';
+import { loadTemplate } from '../../util/loadTemplate'
+import { errorHandler, isLoggedIn, modelHandler } from '../../util/plugins'
+import ListingModel from '../../models/listing';
 
 // The router to use
 export const listingRouter = express.Router()

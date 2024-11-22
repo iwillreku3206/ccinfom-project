@@ -1,13 +1,13 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
 import log from 'log'
-import { authRouter } from '../controllers/authController'
+import { authRouter } from '../controllers/auth/authController'
 import { rootRouter } from '../controllers/rootController'
 import cookieParser from 'cookie-parser'
-import { profileRouter } from '../controllers/profileController'
-import { gameRouter } from '../controllers/gamesController'
-import { listingRouter } from '../controllers/listingController'
-import { userInvItemsRouter } from '../controllers/uiiController'
-import { adminRouter } from '../controllers/adminController'
+import { profileRouter } from '../controllers/model/profileController'
+import { gameRouter } from '../controllers/model/gamesController'
+import { listingRouter } from '../controllers/model/listingController'
+import { userInvItemsRouter } from '../controllers/model/uiiController'
+import { adminRouter } from '../controllers/auth/adminController'
 
 export const app = express()
 
