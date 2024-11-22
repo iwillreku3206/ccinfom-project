@@ -1,7 +1,7 @@
 /**
  * @ Author: Group 1
  * @ Create Time: 2024-11-23 02:09:04
- * @ Modified time: 2024-11-23 02:22:45
+ * @ Modified time: 2024-11-23 04:09:53
  * @ Description:
  */
 
@@ -53,6 +53,7 @@ export class GameModel extends Model {
     private constructor() {
         super()
         super.register('create', create_game_query, game => [ game.name, game.description ])
+        super.register('get-all', get_all_games_query, _ => [])
         super.register('get-by-name', get_game_by_name_query, game => [ game.name ])
     }
 

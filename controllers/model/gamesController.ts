@@ -28,6 +28,7 @@ gameRouter.get('/view', async (req: Request, res: Response) => {
   render(res, "viewGames", {
     username: user?.username, 
     displayName: user?.displayName || user?.username,
+    gameData: JSON.stringify(await model.getAllGames()),
     error
   })
 })

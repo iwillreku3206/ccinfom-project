@@ -1,29 +1,97 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-  <title>Vapor Community Market</title>
-  <link rel="stylesheet" href="/assets/xp.css">
-  <link rel="stylesheet" href="/assets/styles.css">
-</head>
+	<head>
+		<title>Vapor Community Market</title>
+		<link rel="stylesheet" href="/assets/xp.css">
+		<link rel="stylesheet" href="/assets/styles.css">
+	</head>
 
-<body>
-    <main class="center-container">
-        <div class="window" style="width: 300px">
-            <div class="title-bar">
-                <div class="title-bar-text">Games</div>
-                <div class="title-bar-controls">
-                    <button aria-label="Close" onclick="location.href='/home'"></button>
-                </div>
-            </div>
-            <div class="window-body" style="background: white">
-                <div class="menu-container">
-                    
-                </div>
-            </div>
-            <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
-        </div>
-    </main>
-</body> 
+	<body>
+		<main class="center-container">
+			<div class="window" style="width: 300px">
+				<div class="title-bar">
+					<div class="title-bar-text">Vapor Market - Games</div>
+					<div class="title-bar-controls">
+						<button aria-label="Close" onclick="location.href='/home'"></button>
+					</div>
+				</div>
+				<div class="window-body" style="background: white">
+	
+					<fieldset>
+						<legend>Enter search terms</legend>
+						<form method="POST" action="/games/view">
+							<label for="item">Search by name</label>
+							<input type="text" name="item" id="item" placeholder="none" value="">
+							<br>
+							<br>
+							
+							<section class="field-row form-buttons">
+								<button type="reset">Reset</button>
+								<button type="submit">Filter</button>
+							</section>
+						</form>
+						<p class="error">{{error}}</p>
+					</fieldset>
+					
+					<fieldset>
+						<legend>Games</legend>
+						<table class="table">
+		
+						</table>
+					</fieldset>
+				</div>
+				<div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
+			</div>
+		</main>
+		<script src="/assets/utils.js"></script>
+		<script>
+
+			// DOM stuff we'll use
+			const games = JSON.parse('{{{gameData}}}');
+			const table = DOM.select('.table')
+
+			<!-- ! dummy data -->
+			// ! remove
+			// Populate games with dummy data
+			for(let i = 0; i < 10; i++) {
+				games.push({
+					name: Math.random().toString(),
+					description: Math.random().toString(),
+				})
+			}
+
+			// The new elements we'll use
+			const button = () => DOM.element('button')
+			const tr = () => DOM.element('tr')
+			const td = () => DOM.element('td')
+			const th = () => DOM.element('th')
+			const br = () => DOM.element('br')
+
+			// Adds the headers of the table
+			table.append(
+				tr().append(
+					th().text('Game'),
+					th().text('Description'),
+					th()
+				)
+			)
+
+			/**
+				* Maps each games to a table row.
+				*/
+			const game_mapper = (game) => (
+				tr().class('table-row').append(
+					td().text(game.name),
+					td().text(game.description),
+					td().append(button().stl({ color: 'red' }).text('delete')),
+					br()
+				)
+			)
+
+			games.map(game_mapper).map(e => table.append(e))
+		</script>
+	</body> 
+
 
 </html>

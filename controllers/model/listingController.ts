@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-16 11:34:48
- * @ Modified time: 2024-11-23 03:56:31
+ * @ Modified time: 2024-11-23 04:11:41
  * @ Description:
  * 
  * A controller for the listings-related pages and functionality.
@@ -24,23 +24,23 @@ listingRouter.use(errorHandler(new Map([])))
  * The page for the create listing form.
  */
 listingRouter.get('/create', async (req, res) => {
-  const { user, error } = res.locals;
+  const { user, model, error } = res.locals;
   render(res, "createListing", { error })
 })
 
 /**
  * Grabs the listings associated with the user.
  */
-listingRouter.get('/list', async (req, res) => {
-  const { user, error } = res.locals;
-  const listingData = JSON.stringify(await ListingModel.instance.getAllListings())
+listingRouter.get('/view', async (req, res) => {
+  const { user, model, error } = res.locals;
+  const listingData = JSON.stringify(await model.getAllListings())
   render(res, 'viewListings', { listingData, error })
 })
 
 /**
  * Grabs the listings associated with the user.
  */
-listingRouter.post('/list', async (req, res) => {
+listingRouter.post('/view', async (req, res) => {
   const { user, error } = res.locals;
   const { item, seller, price, date } = req.body;
 
