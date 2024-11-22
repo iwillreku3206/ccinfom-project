@@ -2,6 +2,8 @@ import argon2 from "argon2"
 import { type RowDataPacket } from "mysql2"
 import Model, { type SQLValueList } from "./model"
 import log from "log"
+import type { IListing } from "./listing"
+import type { UserInventoryItems } from "./userInventoryItems"
 
 export interface IUser {
   id: number,
@@ -11,6 +13,29 @@ export interface IUser {
   userType: 'basic' | 'admin'
   passwordHash: string
 };
+
+export interface IUserProfile {
+  username: string,
+  displayName: string,
+  balance: number,
+  userType: 'basic' | 'admin',
+  listings: IUserProfileListing[],
+  inventory: IUserProfileInventoryItem[],
+}
+
+export interface IUserProfileListing {
+  id: number,
+  name: string,
+  gameName: string,
+  price: number,
+  date: Date
+}
+
+export interface IUserProfileInventoryItem {
+  name: string,
+  gameName: string,
+  obtainedOn: Date
+}
 
 // Specs
 type create_user_spec = Omit<IUser, 'id' | 'balance'>
@@ -66,6 +91,50 @@ const update_user_password_by_session_query = `
     SET   u.password_hash = ?;
 `
 
+const get_user_basic_info_query = `
+  SELECT  u.username AS username,
+          u.display_name AS displayName,
+          u.balance AS balance,
+          u.user_type AS userType
+  FROM    users u
+  WHERE   u.username = ?
+  LIMIT   1;
+`
+
+const get_user_items_query = `
+  SELECT  i.name AS name,
+          g.name AS gameName,
+          ui.obtained_on AS obtainedOn
+  FROM    users u
+  WHERE   u.username = ?
+  JOIN    inventory_items ui
+      ON  u.id = ui.user
+  JOIN    items i
+      ON  i.id = ui.item
+  JOIN    games g
+      ON  g.id = i.game
+  ORDER BY gameName, name
+  LIMIT   1;
+`
+
+const get_user_listings_query = `
+  SELECT  i.id AS id,
+          i.name AS name,
+          g.name AS gameName,
+          l.price AS price,
+          l.list_date AS date
+  FROM    users u
+  WHERE   u.username = ?
+  JOIN    listings l
+      ON  l.seller = u.id
+  JOIN    items i
+      ON  l.item = i.id
+  JOIN    games g
+      ON  g.id = l.game
+  ORDER BY date DESC
+  LIMIT   1;
+`
+
 export default class UserModel extends Model {
   static #instance: UserModel
 
@@ -91,10 +160,16 @@ export default class UserModel extends Model {
       .register('update-profile-by-session', update_user_profile_by_session_query, user => [user.sessionId, user.username, user.displayName])
     super
       .register('update-password-by-session', update_user_password_by_session_query, user => [user.sessionId, user.passwordHash])
+    super
+      .register('get-basic-info', get_user_basic_info_query, user => [user.username])
+    super
+      .register('get-listings', get_user_listings_query, user => [user.username])
+    super
+      .register('get-items', get_user_items_query, user => [user.username])
   }
 
   public async createUser(user: create_user_spec) {
-    await super.execute('create', user as SQLValueList)
+    await super.execute('create', user)
   }
 
   public async getUserByUsername(username: string): Promise<IUser | null> {
@@ -131,6 +206,37 @@ export default class UserModel extends Model {
     if (password == "") throw new Error("Password cannot be empty")
     const password_hash = await argon2.hash(password)
     await super.execute('update-password-by-session', { sessionId: session, passwordHash: password_hash })
+  }
+
+  public async getUserProfile(username: string): Promise<IUserProfile | null> {
+    const basicInfo = await super.execute<RowDataPacket[]>('get-basic-info', { username })
+    if (basicInfo.length == 0) return null
+
+    const items = await super.execute<RowDataPacket[]>('get-items', { username })
+
+    const itemList: IUserProfileInventoryItem[] = items.map(i => ({
+      name: i[0],
+      gameName: i[1],
+      obtainedOn: i[2]
+    }))
+
+    const listings = await super.execute<RowDataPacket[]>('get-listings', { username })
+    const listingList: IUserProfileListing[] = listings.map(i => ({
+      id: i[0],
+      name: i[1],
+      gameName: i[2],
+      price: i[3],
+      date: i[4],
+    }))
+
+    return {
+      username: basicInfo[0][0],
+      displayName: basicInfo[0][1],
+      balance: basicInfo[0][2],
+      userType: basicInfo[0][3],
+      listings: listingList,
+      inventory: itemList
+    }
   }
 }
 

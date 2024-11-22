@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Vapor Community Market</title>
+  <link rel="stylesheet" href="/assets/xp.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+
+<body>
+  <main class="center-container">
+    <div class="window" style="width: 300px">
+      <div class="title-bar">
+        <div class="title-bar-text">Admin Control Panel</div>
+        <div class="title-bar-controls">
+          <button aria-label="Close" onclick="location.href='/home'"></button>
+        </div>
+      </div>
+      <div class="window-body" style="background: white">
+        <div class="menu-container">
+          <a href="/profile/update" class="menu-item"><img src="/assets/user.png" alt="" class="menu-icon"><span
+              class="menu-text">User Management</span></a>
+        </div>
+      </div>
+      <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
+    </div>
+  </main>
+</body>
+
+</html>

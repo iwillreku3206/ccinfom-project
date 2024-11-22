@@ -7,6 +7,7 @@ import { profileRouter } from '../controllers/profileController'
 import { gamesRouter } from '../controllers/gamesController'
 import { listingRouter } from '../controllers/listingController'
 import { userInvItemsRouter } from '../controllers/uiiController'
+import { adminRouter } from '../controllers/adminController'
 
 export const app = express()
 
@@ -21,6 +22,7 @@ app.use(express.static("public"))
 app.use(cookieParser())
 
 app.use("/auth", authRouter)
+app.use("/admin", adminRouter)
 app.use("/", rootRouter)
 app.use("/profile", profileRouter)
 app.use("/games", gamesRouter)
