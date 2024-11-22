@@ -36,11 +36,12 @@ export default class Model {
    * @param query_string	The query string to execute. 
    * @return							A promise for the results of the query.
    */
-  private async query<T extends QueryResult>(queryString: string, ...params: any[]): Promise<T> {
+  private async query<T extends QueryResult>(queryString: string, params: any[]): Promise<T> {
+    const filteredParams = params.map(p => p === undefined ? null : p)
+    console.log({ queryString, filteredParams })
     const [results, _] =
-      await db.execute<T>(queryString,
-        params.map(p => p === undefined ? null : p))
-    return results
+      await db.execute(queryString, filteredParams)
+    return results as T
   }
 
   /**
@@ -73,8 +74,11 @@ export default class Model {
     if (!q) {
       return Promise.reject(`Query '${name}' does not exist`)
     }
-
-    return q(input)
+    try {
+      return q(input)
+    } catch (e) {
+      return Promise.reject(`Error executing ${name}: ${e}`)
+    }
   }
 
   constructor() {
