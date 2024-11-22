@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-16 10:43:56
- * @ Modified time: 2024-11-19 16:44:04
+ * @ Modified time: 2024-11-22 14:35:33
  * @ Description:
  * 
  * Manages mapping listings to runtime objects.
@@ -44,27 +44,33 @@ export default class ListingModel extends Model {
     return ListingModel.#instance
   }
 
+  /**
+   * Registers the queries and creates the instance.
+   */
   private constructor() {
     super()
-    // Register the queries
-    super
-      .register('create', create_listing_query, listing => [listing.item, listing.price, listing.seller])
-    super
-      .register('get-all', get_listings_query, _ => [])
-    super
-      .register('get-by-item', get_listing_by_item_query, listing => [listing.item])
-    super
-      .register('get-by-price', get_listing_by_price_query, listing => [listing.price])
-    super
-      .register('get-by-seller', get_listing_by_seller_query, listing => [listing.seller])
-    super
-      .register('get-by-list-date', get_listing_by_list_date_query, listing => [listing.list_date])
+    super.register('create', create_listing_query, listing => [listing.item, listing.price, listing.seller])
+    super.register('get-all', get_listings_query, _ => [])
+    super.register('get-by-item', get_listing_by_item_query, listing => [listing.item])
+    super.register('get-by-price', get_listing_by_price_query, listing => [listing.price])
+    super.register('get-by-seller', get_listing_by_seller_query, listing => [listing.seller])
+    super.register('get-by-list-date', get_listing_by_list_date_query, listing => [listing.list_date])
   }
 
+  /**
+   * Creates a new listing.
+   * 
+   * @param listing   A spec for the new listing to create. 
+   */
   async createListing(listing: create_listing_spec): Promise<void> {
     await this.execute('create', listing)
   }
 
+  /**
+   * Retrieve all the listings.
+   * 
+   * @returns 
+   */
   async getAllListings(): Promise<IListing[]> {
     const res = await super.execute<RowDataPacket[]>('get-all', {})
     return []

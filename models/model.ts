@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-19 13:53:00
- * @ Modified time: 2024-11-19 17:32:07
+ * @ Modified time: 2024-11-22 14:38:06
  * @ Description:
  * 
  * A template for model classes.
@@ -38,7 +38,6 @@ export default class Model {
    */
   private async query<T extends QueryResult>(queryString: string, params: any[]): Promise<T> {
     const filteredParams = params.map(p => p === undefined ? null : p)
-    console.log({ queryString, filteredParams })
     const [results, _] =
       await db.execute(queryString, filteredParams)
     return results as T
@@ -70,7 +69,7 @@ export default class Model {
     name: string,
     input: SQLValueList
   ): Promise<T> {
-    const q = this.QUERIES.get(name) ?? undefined
+    const q = this.QUERIES.get(name) ?? null
     if (!q) {
       return Promise.reject(`Query '${name}' does not exist`)
     }
