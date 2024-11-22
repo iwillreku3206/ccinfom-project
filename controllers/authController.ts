@@ -6,6 +6,7 @@ import argon2 from 'argon2'
 import crypto from 'crypto'
 import SessionModel from '../models/session'
 import UAParser from 'ua-parser-js'
+import log from 'log'
 
 export const authRouter = express.Router()
 
@@ -112,4 +113,17 @@ export async function isLoggedIn(req: Request, res: Response, next: NextFunction
   res.locals.user = user;
   res.locals.error = req.query.error?.toString() ?? '';
   next()
+}
+
+export function isAdmin(callback: string) {
+  return async (_: Request, res: Response, next: NextFunction) => {
+    if (!res.locals.user) log.error("Run isLoggedIn first!")
+
+    console.log("type", res.locals.user)
+    if (res.locals.user.userType === 'admin') {
+      return next()
+    } else {
+      return res.redirect(`${callback}?error=unauthorized`)
+    }
+  }
 }
