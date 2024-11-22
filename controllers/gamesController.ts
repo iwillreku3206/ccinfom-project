@@ -1,24 +1,18 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
-import { createErrorHandler, isLoggedIn } from './plugins'
-import UserModel from '../models/user'
+import { errorHandler, isLoggedIn, modelHandler } from './plugins'
 import mustache from 'mustache'
 import { loadTemplate } from '../util/loadTemplate'
 import { GameModel } from '../models/game'
 
 export const gameRouter = express.Router()
 
-// Handles error
-const gameRouterErrorHandler = createErrorHandler(new Map([
+gameRouter.use(isLoggedIn)
+gameRouter.use(modelHandler(GameModel.instance))
+gameRouter.use(errorHandler(new Map([
   [ 'adminsonly', 'Only admins can create new games.' ]
-]))
+])))
 
-// Specify model to use
-gameRouter.use((req, res, next) => (
-  res.locals.model = GameModel.instance,
-  next()
-))
-
-gameRouter.get('/', isLoggedIn, gameRouterErrorHandler, async (req: Request, res: Response) => {
+gameRouter.get('/', async (req: Request, res: Response) => {
   const { user, model, error } = res.locals;
 
   res.send(mustache.render(await loadTemplate("games"), {
@@ -28,7 +22,7 @@ gameRouter.get('/', isLoggedIn, gameRouterErrorHandler, async (req: Request, res
   }))
 })
 
-gameRouter.get('/view', isLoggedIn, gameRouterErrorHandler, async (req: Request, res: Response) => {
+gameRouter.get('/view', async (req: Request, res: Response) => {
   const { user, model, error } = res.locals;
 
   res.send(mustache.render(await loadTemplate("viewGames"), {
@@ -38,7 +32,7 @@ gameRouter.get('/view', isLoggedIn, gameRouterErrorHandler, async (req: Request,
   }))
 })
 
-gameRouter.get('/add', isLoggedIn, gameRouterErrorHandler, async (req: Request, res: Response) => {
+gameRouter.get('/add', async (req: Request, res: Response) => {
   const { user, model, error } = res.locals;
 
   if (user?.userType == 'basic')
@@ -51,7 +45,7 @@ gameRouter.get('/add', isLoggedIn, gameRouterErrorHandler, async (req: Request, 
   }))
 })
 
-gameRouter.post('/add', isLoggedIn, gameRouterErrorHandler, async (req: Request, res: Response) => {
+gameRouter.post('/add', async (req: Request, res: Response) => {
   const { user, model, error } = res.locals;
   
   try {

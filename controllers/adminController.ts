@@ -10,6 +10,10 @@ adminRouter.use(isLoggedIn)
 adminRouter.use(isAdmin)
 
 adminRouter.get('/', async (req, res) => {
-  const user = res.locals.user;
-  res.send(mustache.render(await loadTemplate("admin"), { username: user?.username, displayName: user?.displayName || user?.username }))
+  const { user } = res.locals;
+  
+  res.send(mustache.render(await loadTemplate("admin"), { 
+    username: user?.username, 
+    displayName: user?.displayName || user?.username 
+  }))
 })

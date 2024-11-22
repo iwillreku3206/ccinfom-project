@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-16 11:34:48
- * @ Modified time: 2024-11-23 03:09:32
+ * @ Modified time: 2024-11-23 03:24:00
  * @ Description:
  * 
  * A controller for the listings-related pages and functionality.
@@ -10,22 +10,21 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
 import mustache from 'mustache'
 import { loadTemplate } from '../util/loadTemplate'
-import { isLoggedIn } from './plugins'
+import { errorHandler, isLoggedIn, modelHandler } from './plugins'
 import ListingModel from '../models/listing';
 
 // The router to use
 export const listingRouter = express.Router()
 
 // Specify the model to use
-listingRouter.use((req, res, next) => (
-  res.locals.model = ListingModel.instance,
-  next()
-))
+listingRouter.use(isLoggedIn)
+listingRouter.use(modelHandler(ListingModel.instance))
+listingRouter.use(errorHandler(new Map([])))
 
 /**
  * The page for the create listing form.
  */
-listingRouter.get('/create', isLoggedIn, async (req: Request, res: Response) => {
+listingRouter.get('/create', async (req: Request, res: Response) => {
   const { user, error } = res.locals;
   res.send(mustache.render(await loadTemplate("createListing"), { error }))
 })
@@ -33,7 +32,7 @@ listingRouter.get('/create', isLoggedIn, async (req: Request, res: Response) => 
 /**
  * Grabs the listings associated with the user.
  */
-listingRouter.get('/list', isLoggedIn, async (req: Request, res: Response) => {
+listingRouter.get('/list', async (req: Request, res: Response) => {
   const { user, error } = res.locals;
   const listingData = JSON.stringify(await ListingModel.instance.getAllListings())
 
@@ -43,7 +42,7 @@ listingRouter.get('/list', isLoggedIn, async (req: Request, res: Response) => {
 /**
  * Grabs the listings associated with the user.
  */
-listingRouter.post('/list', isLoggedIn, async (req: Request, res: Response) => {
+listingRouter.post('/list', async (req: Request, res: Response) => {
   const { user, error } = res.locals;
   const { item, seller, price, date } = req.body;
 
@@ -62,7 +61,7 @@ listingRouter.post('/list', isLoggedIn, async (req: Request, res: Response) => {
 /**
  * A request for posting a new listing in the database.
  */
-listingRouter.post('/post', isLoggedIn, async (req: Request, res: Response) => {
+listingRouter.post('/post', async (req: Request, res: Response) => {
   const { user, model, error } = res.locals;
 
   // ! todo, search for item in item database

@@ -1,15 +1,16 @@
 import express, { type Request, type Response } from 'express'
-import { isLoggedIn } from './plugins'
+import { isLoggedIn, modelHandler } from './plugins'
 import UserModel from '../models/user'
 import mustache from 'mustache'
 import { loadTemplate } from '../util/loadTemplate'
 
 export const profileRouter = express.Router()
 
-profileRouter.get('/update', isLoggedIn, async (req: Request, res: Response) => {
-  const user = res.locals.user;
+profileRouter.use(isLoggedIn)
+profileRouter.use(modelHandler(UserModel.instance))
 
-  let error = req.query.error?.toString() ?? ''
+profileRouter.get('/update', async (req: Request, res: Response) => {
+  const { user, model, error } = res.locals;
 
   res.send(mustache.render(await loadTemplate("updateProfile"), {
     username: user?.username,
@@ -19,19 +20,23 @@ profileRouter.get('/update', isLoggedIn, async (req: Request, res: Response) => 
 })
 
 // HTML forms do not support PUT/PATCH
-profileRouter.post('/update', isLoggedIn, async (req: Request, res: Response) => {
+profileRouter.post('/update', async (req: Request, res: Response) => {
+  const { user, model, error } = res.locals;
+
   try {
-    await UserModel.instance.updateProfileBySession({ sessionId: req.cookies.session, username: req.body.username, displayName: req.body.displayName })
+    await model.updateProfileBySession({ 
+      sessionId: req.cookies.session, 
+      username: req.body.username, 
+      displayName: req.body.displayName 
+    })
   } catch (error) {
     return res.redirect("/profile/update?error=" + error)
   }
   return res.redirect("/home")
 })
 
-profileRouter.get("/", isLoggedIn, async (req, res) => {
-  const user = res.locals.user;
-
-  let error = req.query.error?.toString() ?? ''
+profileRouter.get("/", async (req, res) => {
+  const { user, model, error } = res.locals;
 
   res.send(mustache.render(await loadTemplate("viewProfile1"), {
     username: user?.username,

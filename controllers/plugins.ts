@@ -1,7 +1,7 @@
 /**
  * @ Author: Group 1
  * @ Create Time: 2024-11-23 02:57:02
- * @ Modified time: 2024-11-23 03:04:49
+ * @ Modified time: 2024-11-23 03:15:50
  * @ Description:
  * 
  * Our middleware plugins.
@@ -10,6 +10,7 @@
 import type { Request, Response, NextFunction } from "express";
 import UserModel from "../models/user";
 import log from "log";
+import type Model from "../models/model";
 
 /**
  * Appends the current logged in user to the context of each pipe. 
@@ -33,14 +34,25 @@ export const isAdmin = async (_: Request, res: Response, next: NextFunction) => 
 )
 
 /**
+ * Specifies a model a particular router will use.
+ * NOTE: this function is a middleware GENERATOR, not middleware itself.
+ * 
+ * @param instance  The instance the router will use. 
+ * @return          A middleware function. 
+ */
+export const modelHandler = (instance: Model) => 
+  (req: Request, res: Response, next: NextFunction) =>
+    (res.locals.model = instance, next())
+
+/**
  * Creates a new function that returns an error handler.
  * See gameController.ts or listingController.ts for more info on how to use.
- * NOTE: this function is a middleware GENERATOR, not middleware itself.
- *  
+ * This generates middleware functions too.  
+ * 
  * @param descriptions  The descriptions of each error to handle.
  * @returns             An error handling middleware func. 
  */
-export const createErrorHandler = (descriptions: Map<string, string>) => (
+export const errorHandler = (descriptions: Map<string, string>) => (
 
   // Create a new middleware that handles translating error keys to error messages 
   (req: Request, res: Response, next: NextFunction) => (

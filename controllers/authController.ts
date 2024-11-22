@@ -4,11 +4,12 @@ import mustache from 'mustache'
 import { loadTemplate } from '../util/loadTemplate'
 import argon2 from 'argon2'
 import SessionModel from '../models/session'
-import { isLoggedIn, createErrorHandler } from './plugins'
+import { isLoggedIn, errorHandler } from './plugins'
 
 export const authRouter = express.Router()
 
-const authErrorHandler = createErrorHandler(new Map([
+// Specify how to describe errors
+const authErrorHandler = errorHandler(new Map([
   [ 'missingfields', 'Please ensure you have a username and password.' ],
   [ 'noaccount', 'Incorrect username/password' ]
 ]))
@@ -28,7 +29,7 @@ authRouter.post('/logout', async (req, res) => {
   res.clearCookie("session").redirect("/")
 })
 
-authRouter.post<{}, {}, { username?: string, password?: string, displayName?: string }>('/register', async (req, res) => {
+authRouter.post('/register', async (req, res) => {
   if (!req.body.username || !req.body.password)
     return res.redirect("/auth/register?error=missingfields")
 
@@ -51,7 +52,7 @@ authRouter.post<{}, {}, { username?: string, password?: string, displayName?: st
   }
 })
 
-authRouter.post<{}, {}, { username?: string, password?: string }>('/login', async (req, res) => {
+authRouter.post('/login', async (req, res) => {
   if (!req.body.username || !req.body.password)
     return res.redirect('/auth/login?error=missingfields')
 
