@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-22 14:42:30
- * @ Modified time: 2024-11-22 14:56:33
+ * @ Modified time: 2024-11-22 15:13:55
  * @ Description:
  * 
  * A bunch of front-end utils just to make our lives easier.
@@ -21,7 +21,7 @@ const DOM = (() => {
 
 		// Sets the text content of the element
 		text: (text) => (
-			text 
+			text !== undefined
 				? (element.textContent = text, element)
 				: (element.outerHTML) 
 		),
@@ -34,7 +34,7 @@ const DOM = (() => {
 		),
 
 		// Set the style of the element with the object provided
-		style: (styles) => (
+		stl: (styles) => (
 			Object.keys(styles).map(style => 
 				element.style[style] = styles[style]),
 			element
