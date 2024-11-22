@@ -1,13 +1,13 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-16 10:43:56
- * @ Modified time: 2024-11-22 14:35:33
+ * @ Modified time: 2024-11-23 01:50:47
  * @ Description:
  * 
  * Manages mapping listings to runtime objects.
  */
 
-import type { RowDataPacket } from "mysql2";
+import type { QueryResult, RowDataPacket } from "mysql2";
 import Model from "./model"
 
 // The interface
@@ -49,12 +49,12 @@ export default class ListingModel extends Model {
    */
   private constructor() {
     super()
-    super.register('create', create_listing_query, listing => [listing.item, listing.price, listing.seller])
+    super.register('create', create_listing_query, listing => [ listing.item, listing.price, listing.seller ])
     super.register('get-all', get_listings_query, _ => [])
-    super.register('get-by-item', get_listing_by_item_query, listing => [listing.item])
-    super.register('get-by-price', get_listing_by_price_query, listing => [listing.price])
-    super.register('get-by-seller', get_listing_by_seller_query, listing => [listing.seller])
-    super.register('get-by-list-date', get_listing_by_list_date_query, listing => [listing.list_date])
+    super.register('get-by-item', get_listing_by_item_query, listing => [ listing.item ])
+    super.register('get-by-price', get_listing_by_price_query, listing => [ listing.min, listing.max ])
+    super.register('get-by-seller', get_listing_by_seller_query, listing => [ listing.seller ])
+    super.register('get-by-list-date', get_listing_by_list_date_query, listing => [ listing.min, listing.max ])
   }
 
   /**
@@ -72,12 +72,24 @@ export default class ListingModel extends Model {
    * @returns 
    */
   async getAllListings(): Promise<IListing[]> {
-    const res = await super.execute<RowDataPacket[]>('get-all', {})
-    return []
-    // TODO: fix
-    //return res.map(r => {
-    //  /*TODO: fix this */
-    //})
+    let results = await super.execute<RowDataPacket[]>('get-all', {})
+    return results.map((result: RowDataPacket) => (result as IListing))
+  }
+
+  /**
+   * Retrieves a filtered version of the listings
+   */
+  async getFilteredListings(filter: string, ...values: any): Promise<IListing[] | null> {
+    let results = null;
+
+    switch(filter) {
+      case 'item': results = await this.execute<RowDataPacket[]>('get-by-item', { item: values[0] }); break;
+      case 'price': results = await this.execute<RowDataPacket[]>('get-by-price', { min: values[0], max: values[1] }); break;
+      case 'seller': results = await this.execute<RowDataPacket[]>('get-by-seller', { seller: values[0] }); break;
+      case 'list_date': results = await this.execute<RowDataPacket[]>('get-by-list-date', { min: values[0], max: values[1] }); break;
+    }
+
+    return results?.map((result: RowDataPacket) => (result as IListing)) ?? null;
   }
 }
 

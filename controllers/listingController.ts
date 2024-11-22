@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-16 11:34:48
- * @ Modified time: 2024-11-19 14:57:13
+ * @ Modified time: 2024-11-23 01:51:19
  * @ Description:
  * 
  * A controller for the listings-related pages and functionality.
@@ -41,9 +41,6 @@ listingRouter.post('/list', isLoggedIn, async (req: Request, res: Response) => {
   const { user, error } = res.locals;
   const { item, seller, price, date } = req.body;
 
-  // ! remove the parsing here
-  // ! improve logic
-  // // TODO: refactor
   // const listings = await (() => (
   //   item?.length ? Listing.execute('get-by-item', { item: parseInt(item) })
   //     : seller?.length ? Listing.execute('get-by-seller', { seller: parseInt(seller) })
