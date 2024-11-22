@@ -1,8 +1,6 @@
-import express, { type Request, type Response } from 'express'
+import express from 'express'
 import { isAdmin, isLoggedIn } from '../../util/plugins'
-import mustache from 'mustache'
-import UserModel from '../../models/user'
-import { loadTemplate } from '../../util/loadTemplate'
+import { render } from '../../util/io'
 
 export const adminRouter = express.Router()
 
@@ -11,9 +9,8 @@ adminRouter.use(isAdmin)
 
 adminRouter.get('/', async (req, res) => {
   const { user } = res.locals;
-  
-  res.send(mustache.render(await loadTemplate("admin"), { 
+  render(res, "admin", { 
     username: user?.username, 
     displayName: user?.displayName || user?.username 
-  }))
+  })
 })

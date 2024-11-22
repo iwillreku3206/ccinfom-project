@@ -1,15 +1,14 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-16 11:34:48
- * @ Modified time: 2024-11-23 03:24:00
+ * @ Modified time: 2024-11-23 03:56:31
  * @ Description:
  * 
  * A controller for the listings-related pages and functionality.
  */
 
-import express, { type NextFunction, type Request, type Response } from 'express'
-import mustache from 'mustache'
-import { loadTemplate } from '../../util/loadTemplate'
+import express from 'express'
+import { render } from '../../util/io'
 import { errorHandler, isLoggedIn, modelHandler } from '../../util/plugins'
 import ListingModel from '../../models/listing';
 
@@ -24,25 +23,24 @@ listingRouter.use(errorHandler(new Map([])))
 /**
  * The page for the create listing form.
  */
-listingRouter.get('/create', async (req: Request, res: Response) => {
+listingRouter.get('/create', async (req, res) => {
   const { user, error } = res.locals;
-  res.send(mustache.render(await loadTemplate("createListing"), { error }))
+  render(res, "createListing", { error })
 })
 
 /**
  * Grabs the listings associated with the user.
  */
-listingRouter.get('/list', async (req: Request, res: Response) => {
+listingRouter.get('/list', async (req, res) => {
   const { user, error } = res.locals;
   const listingData = JSON.stringify(await ListingModel.instance.getAllListings())
-
-  res.send(mustache.render(await loadTemplate("viewListings"), { listingData, error }))
+  render(res, 'viewListings', { listingData, error })
 })
 
 /**
  * Grabs the listings associated with the user.
  */
-listingRouter.post('/list', async (req: Request, res: Response) => {
+listingRouter.post('/list', async (req, res) => {
   const { user, error } = res.locals;
   const { item, seller, price, date } = req.body;
 
@@ -54,14 +52,13 @@ listingRouter.post('/list', async (req: Request, res: Response) => {
   //       : Listing.execute('get-all')
   // ))()
   const listingData = JSON.stringify([])
-
-  res.send(mustache.render(await loadTemplate("viewListings"), { listingData, error }))
+  render(res, 'viewListings', { listingData, error })
 })
 
 /**
  * A request for posting a new listing in the database.
  */
-listingRouter.post('/post', async (req: Request, res: Response) => {
+listingRouter.post('/post', async (req, res) => {
   const { user, model, error } = res.locals;
 
   // ! todo, search for item in item database

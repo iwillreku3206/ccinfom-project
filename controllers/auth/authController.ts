@@ -1,7 +1,6 @@
-import express, { type NextFunction, type Request, type Response } from 'express'
+import express from 'express'
 import UserModel from '../../models/user'
-import mustache from 'mustache'
-import { loadTemplate } from '../../util/loadTemplate'
+import { render } from '../../util/io'
 import argon2 from 'argon2'
 import SessionModel from '../../models/session'
 import { isLoggedIn, errorHandler } from '../../util/plugins'
@@ -16,12 +15,12 @@ const authErrorHandler = errorHandler(new Map([
 
 authRouter.get('/register', authErrorHandler, async (req, res) => {
   const { error } = res.locals;
-  res.send(mustache.render(await loadTemplate("register"), { error }))
+  render(res, "register", { error })
 })
 
 authRouter.get('/login', authErrorHandler, async (req, res) => {
   const { error } = res.locals;
-  res.send(mustache.render(await loadTemplate("login"), { error }))
+  render(res, "login", { error })
 })
 
 authRouter.post('/logout', async (req, res) => {

@@ -2,7 +2,7 @@ import express, { type NextFunction, type Request, type Response } from 'express
 import { errorHandler, isLoggedIn, modelHandler } from '../../util/plugins'
 import mustache from 'mustache'
 import { GameModel } from '../../models/game'
-import { loadTemplate } from '../../util/loadTemplate'
+import { render } from '../../util/io'
 
 export const gameRouter = express.Router()
 
@@ -15,21 +15,21 @@ gameRouter.use(errorHandler(new Map([
 gameRouter.get('/', async (req: Request, res: Response) => {
   const { user, model, error } = res.locals;
 
-  res.send(mustache.render(await loadTemplate("games"), {
+  render(res, "games", {
     username: user?.username, 
     displayName: user?.displayName || user?.username,
     error
-  }))
+  })
 })
 
 gameRouter.get('/view', async (req: Request, res: Response) => {
   const { user, model, error } = res.locals;
 
-  res.send(mustache.render(await loadTemplate("viewGames"), {
+  render(res, "viewGames", {
     username: user?.username, 
     displayName: user?.displayName || user?.username,
     error
-  }))
+  })
 })
 
 gameRouter.get('/add', async (req: Request, res: Response) => {
@@ -38,11 +38,11 @@ gameRouter.get('/add', async (req: Request, res: Response) => {
   if (user?.userType == 'basic')
     return res.redirect('/games?error=adminsonly')
 
-  res.send(mustache.render(await loadTemplate("addGames"), {
+  render(res, "addGames", {
     username: user?.username, 
     displayName: user?.displayName || user?.username,
     error
-  }))
+  })
 })
 
 gameRouter.post('/add', async (req: Request, res: Response) => {

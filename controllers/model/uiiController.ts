@@ -1,14 +1,9 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
 import { getInventoryItemByUserId } from '../../models/userInventoryItems'
 import { isLoggedIn } from '../../util/plugins'
-import mustache from 'mustache'
-import { loadTemplate } from '../../util/loadTemplate'
-import argon2 from 'argon2'
-import SessionModel from '../../models/session'
+import { render } from '../../util/io'
 import UserModel from '../../models/user'
 
-
-const pageRender = async (res: Response, templateName: string, viewOpts: {}) => res.send(mustache.render(await loadTemplate(templateName), viewOpts))
 const redirectError = (res: Response, error_code: string) => res.redirect("/userinventoryitems/inspect?error=" + error_code);
 
 const ERRCODES = Object.freeze({
@@ -60,7 +55,7 @@ userInvItemsRouter.get('/:username', isLoggedIn, async (req, res) => {
       items: selectedItems
     }
 
-    await pageRender(res, "profileItems", viewOpts);
+    await render(res, "profileItems", viewOpts);
   } catch (error) {
     return redirectError(res, String(error))
   }
@@ -81,7 +76,7 @@ userInvItemsRouter.get('/inspect', isLoggedIn, async (req, res) => {
     error
   }
 
-  await pageRender(res, "userInventoryItems", viewOpts)
+  await render(res, "userInventoryItems", viewOpts)
 })
 
 
@@ -106,7 +101,7 @@ userInvItemsRouter.post('/inspect', isLoggedIn, async (req, res) => {
 
     const viewOpts = { items: selectedItems }
 
-    await pageRender(res, "userInventoryItems", viewOpts);
+    await render(res, "userInventoryItems", viewOpts);
   } catch (error) {
     return redirectError(res, String(error))
   }

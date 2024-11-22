@@ -1,8 +1,7 @@
 import express, { type Request, type Response } from 'express'
 import { isLoggedIn, modelHandler } from '../../util/plugins'
 import UserModel from '../../models/user'
-import mustache from 'mustache'
-import { loadTemplate } from '../../util/loadTemplate'
+import { render } from '../../util/io'
 
 export const profileRouter = express.Router()
 
@@ -12,11 +11,11 @@ profileRouter.use(modelHandler(UserModel.instance))
 profileRouter.get('/update', async (req: Request, res: Response) => {
   const { user, model, error } = res.locals;
 
-  res.send(mustache.render(await loadTemplate("updateProfile"), {
+  render(res, "updateProfile", {
     username: user?.username,
     displayName: user?.displayName,
     error
-  }))
+  })
 })
 
 // HTML forms do not support PUT/PATCH
@@ -38,9 +37,9 @@ profileRouter.post('/update', async (req: Request, res: Response) => {
 profileRouter.get("/", async (req, res) => {
   const { user, model, error } = res.locals;
 
-  res.send(mustache.render(await loadTemplate("viewProfile1"), {
+  render(res, "viewProfile1", {
     username: user?.username,
     displayName: user?.displayName,
     error
-  }))
+  })
 })
