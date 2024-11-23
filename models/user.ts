@@ -15,6 +15,7 @@ export interface IUser {
 };
 
 export interface IUserProfile {
+  id: number
   username: string,
   displayName: string,
   balance: number,
@@ -43,6 +44,7 @@ type get_user_by_username_spec = Pick<IUser, 'username'>
 type get_user_by_session_spec = { sessionId: string }
 type update_user_profile_by_session_spec = Pick<IUser, 'username' | 'displayName'> & { sessionId: string }
 type update_user_password_by_session_spec = Pick<IUser, 'passwordHash'> & { sessionId: string }
+type get_all_users_by_type_and_username_spec = Partial<Pick<IUser, "username"> & Pick<IUser, "userType">>
 
 // The model queries
 const create_user_query = `
@@ -114,8 +116,7 @@ const get_user_items_query = `
   JOIN    games g
       ON  g.id = i.game
   WHERE   u.username = ?
-  ORDER BY gameName, name
-  LIMIT   1;
+  ORDER BY gameName, name;
 `
 
 const get_user_listings_query = `
@@ -132,9 +133,27 @@ const get_user_listings_query = `
   JOIN    games g
       ON  g.id = i.game
   WHERE   u.username = ?
-  ORDER BY date DESC
-  LIMIT   1;
+      AND l.sold = 0
+  ORDER BY date DESC;
 `
+
+const getAllUsersByTypeAndUsernameQuery = `
+  SELECT  id,
+          username,
+          display_name AS displayName,
+          balance,
+          user_type AS userType
+  FROM    users
+  WHERE   user_type LIKE ?
+      AND username LIKE ?
+  ORDER BY id;
+`
+
+const deleteUserQuery = `
+DELETE FROM \`users\`
+  WHERE id = ?;
+`
+
 
 export default class UserModel extends Model {
   static #instance: UserModel
@@ -167,6 +186,10 @@ export default class UserModel extends Model {
       .register('get-listings', get_user_listings_query, user => [user.username])
     super
       .register('get-items', get_user_items_query, user => [user.username])
+    super
+      .register('get-users-by-type-username', getAllUsersByTypeAndUsernameQuery, user => [user.userType, user.userName])
+    super
+      .register('delete-user', deleteUserQuery, user => [user.userId])
   }
 
   public async createUser(user: create_user_spec) {
@@ -223,7 +246,16 @@ export default class UserModel extends Model {
       listings
     }
   }
+  public async getAllUsersByTypeAndUsernameQuery(username?: string, userType?: 'basic' | 'admin'): Promise<Omit<IUser, "passwordHash">[]> {
+    const u = !!username ? `%${username}%` : '%'
+    const ut = !!userType ? userType : '%'
+
+    const users = await super.execute('get-users-by-type-username', { userType: ut, userName: u });
+
+    return users as Omit<IUser, "passwordHash">[]
+  }
+
+  public async deleteUser(userId: number) {
+    await super.execute('delete-user', {userId})
+  }
 }
-
-
-

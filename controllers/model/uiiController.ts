@@ -1,108 +1,79 @@
+import argon2 from 'argon2'
 import express, { type NextFunction, type Request, type Response } from 'express'
-import { getInventoryItemByUserId } from '../../models/userInventoryItems'
-import { isLoggedIn } from '../../util/plugins'
+import mustache from 'mustache'
+import { isLoggedIn, errorHandler, modelHandler } from '../../util/plugins'
 import { render } from '../../util/io'
-import UserModel from '../../models/user'
+import UserInventoryItemModel from '../../models/userInventoryItems'
+import log from 'log'
+
 
 const redirectError = (res: Response, error_code: string) => res.redirect("/userinventoryitems/inspect?error=" + error_code);
-
 const ERRCODES = Object.freeze({
-  INVALID_SESSION: "invalid_session"
-  , MISSING_FIELDS: "missing_fields"
-  , MISSING_USER: "missing_user"
-  , NO_ITEMS: "no_items"
-
+    INVALID_SESSION : "invalid_session"
+  , MISSING_FIELDS  : "missing_fields"
+  , MISSING_USER    : "missing_user"
+  , NO_ITEMS        : "no_items"
 })
 
 export const userInvItemsRouter = express.Router()
 
-userInvItemsRouter.get('/usersitems', isLoggedIn, async (req, res) => {
-  const session = req.cookies?.session || '';
-  const user = res.locals.user
+userInvItemsRouter.use(isLoggedIn)
+userInvItemsRouter.use(modelHandler(UserInventoryItemModel.instance))
+userInvItemsRouter.use(errorHandler(new Map([
+  ['invalidSession',  ''],
+  ['missingFields',   ''],
+  ['missingUser',     ''],
+  ['noItems',         'No Items currently in your inventory.'],
+])))
 
-  try {
-    if (user == null)
-      return redirectError(res, ERRCODES["INVALID_SESSION"])
-
-    return res.redirect("/userinventoryitems/" + user.username)
-  } catch {
-    return redirectError(res, ERRCODES["INVALID_SESSION"])
-  }
-
+userInvItemsRouter.get('/user', async (req, res) => {
+  const { user, model, error } = res.locals;
+  res.redirect("/userinventoryitems/" + user.username)
 })
 
-userInvItemsRouter.get('/:username', isLoggedIn, async (req, res) => {
+userInvItemsRouter.get('/:username', async (req, res) => {
+  const { user, model, error } = res.locals;
 
-  const username = req.params.username
-  console.log(username)
+  const selectedItems = JSON.stringify(await model.getFilteredInventoryItems("user", user.username))
 
-  if (!username)
-    return redirectError(res, ERRCODES["MISSING_FIELDS"])
 
-  try {
-    const user = res.locals.user
-    if (!user)
-      return redirectError(res, ERRCODES["MISSING_USER"])
-
-    const selectedItems = await (getInventoryItemByUserId(user?.id))
-    console.log(selectedItems)
-    if (!selectedItems)
-      return redirectError(res, ERRCODES["NO_ITEMS"])
-
-    const viewOpts = {
-      username: user?.username,
-      displayName: user?.displayName,
-      items: selectedItems
-    }
-
-    await render(res, "profileItems", viewOpts);
-  } catch (error) {
-    return redirectError(res, String(error))
+  const viewOpts = {
+    username: user?.username,
+    displayName: user?.displayName,
+    items: selectedItems,
+    error
   }
-})
 
+  render(res, "profileItems", viewOpts);
+})
 
 userInvItemsRouter.get('/inspect', isLoggedIn, async (req, res) => {
-  const user = res.locals.session
-  let error = ""
-
-  if (req.query.error)
-    error = req.query.error.toString()
-
+  const { user, model, error } = res.locals;
+  
+  log.info("inspect")
   let viewOpts = {
     username: user?.username,
     displayName: user?.displayName,
     items: "No items",
     error
   }
-
+  
   await render(res, "userInventoryItems", viewOpts)
 })
 
+userInvItemsRouter.post('/inspect', async (req, res) => {
+  const { user, model, error } = res.locals;
 
-userInvItemsRouter.post('/inspect', isLoggedIn, async (req, res) => {
-  const { username } = req.body
+  const selectedItems = await model.getFilteredInventoryItems("user", user.username)
 
-  if (!username)
-    return res.redirect("/userinventoryitems/inspect/?error=missingfields")
+  console.log(selectedItems)
+  if (!selectedItems)
+    return redirectError(res, ERRCODES["NO_ITEMS"])
 
-
-  try {
-    const selectedUser = await UserModel.instance.getUserByUsername(username)
-
-    if (!selectedUser)
-      return redirectError(res, ERRCODES["MISSING_USER"])
-
-    const selectedItems = await (getInventoryItemByUserId(selectedUser?.id))
-    console.log(selectedItems)
-
-    if (!selectedItems)
-      return redirectError(res, ERRCODES["NO_ITEMS"])
-
-    const viewOpts = { items: selectedItems }
-
-    await render(res, "userInventoryItems", viewOpts);
-  } catch (error) {
-    return redirectError(res, String(error))
-  }
+  const viewOpts = { items: selectedItems }
+  await render(res, "userInventoryItems", viewOpts);
 })
+
+
+
+

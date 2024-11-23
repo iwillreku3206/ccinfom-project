@@ -30,7 +30,7 @@
                         </div>
                         <div class="field-row">
                             <label for="description">Item Game</label>
-                            <select class="games-select" type="text" id="game" name="game" required />
+                            <select class="games-select" type="text" id="game" name="game" required >
                             </select>
                         </div>
                         <div class="field-row form-buttons">
@@ -52,8 +52,8 @@
 		<script>
 
 			// DOM stuff we'll use
-			const items = JSON.parse('{{{itemData}}}');
-			const games = JSON.parse('{{{gameData}}}')
+			const items = JSON.parse(`{{{itemData}}}`);
+			const games = JSON.parse(`{{{gameData}}}`)
             const table = DOM.select('.table')
             const select = DOM.select('.games-select')
 
@@ -96,8 +96,8 @@
                 option().txt(game.name).attribs({ value: game.id })
             )
 
-			items.map(item_mapper).map(e => table.append(e))
             games.map(game_mapper).map(e => select.append(e))
+			items.map(item_mapper).map(e => table.append(e))
 		</script>
     </main>
 </body> 

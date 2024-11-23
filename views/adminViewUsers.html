@@ -5,6 +5,14 @@
   <title>Vapor Community Market</title>
   <link rel="stylesheet" href="/assets/xp.css">
   <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    table,
+    tr,
+    th,
+    td {
+      border-collapse: collapse;
+    }
+  </style>
 </head>
 
 <body>
@@ -17,12 +25,55 @@
         </div>
       </div>
       <div class="window-body" style="background: white">
-        <div class="menu-container">
-          <a href="/profile/update" class="menu-item"><img src="/assets/user.png" alt="" class="menu-icon"><span
-              class="menu-text">User Management</span></a>
-        </div>
+        <div style="color:red;">{{error}}</div>
+        <fieldset>
+          <legend>Filters</legend>
+          <form action="/admin/users" method="get">
+            <label for="ut">User type: </label>
+            <select name="userType" id="ut" selected="{{stype}}">
+              <option value="" {{#selany}}selected{{/selany}}>Any</option>
+              <option value="basic" {{#selbas}}selected{{/selbas}}>Basic</option>
+              <option value="admin" {{#seladmin}}selected{{/seladmin}}>Admin</option>
+            </select>
+            <label for="un">Username: </label>
+            <input type="text" name="username" id="un" value="{{suname}}">
+            <button type="submit">Search</button>
+          </form>
+        </fieldset>
+        <table border>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Username</th>
+              <th>Display Name</th>
+              <th>User Type</th>
+              <th>Balance</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#users}}
+            <tr>
+              <td>{{id}}</td>
+              <td>{{username}}</td>
+              <td>{{displayName}}</td>
+              <td>{{userType}}</td>
+              <td>{{balance}}</td>
+              <td>
+                <a role="button" href="/profile?username={{username}}">View Profile</a>
+                <form action="/admin/users/delete" method="post"
+                  onsubmit="return confirm('This will delete all of the user\'s items, listings and sessions. Continue?')">
+                  <input type="hidden" name="id" value="{{id}}">
+                  <button type="submit">Delete</button>
+                </form>
+              </td>
+            </tr>
+            {{/users}}
+          </tbody>
+        </table>
+
       </div>
-      <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
+      <div class="status-bar">Signed in as {{cdisplayName}} ({{cusername}})</div>
     </div>
   </main>
 </body>
