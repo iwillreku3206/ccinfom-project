@@ -20,9 +20,9 @@
         
       </div>
       <div class="window-body">
-        <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
-        <p>Items: </p>
-        <p style="color: red">{{error}}</p>
+        
+        <p>Items: <span style="color: red">{{error}}</span></p> 
+        
         <p id="item_list">
           <ul>
             {{#items}}
@@ -35,6 +35,7 @@
         </p>
         
       </div>
+      <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
     </div>
   </main>
 </body>
