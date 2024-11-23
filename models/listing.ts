@@ -42,6 +42,21 @@ const delete_listings_by_userid = `
   DELETE FROM \`listings\`
     WHERE seller = ?;
 `
+
+const market_price_report = `
+  SELECT  i.name AS itemName,
+          g.name AS gameName,
+          l.price AS price,
+          l.id AS id,
+          l.list_date AS date
+  FROM    listings l
+  JOIN    items i
+      ON  i.id = l.item
+  JOIN    games g
+      ON  g.id = i.game
+  WHERE  YEAR(l.list_date) = ?
+      AND i.id = ?;
+`
 // The model to use
 export default class ListingModel extends Model {
   static #instance: ListingModel
@@ -67,6 +82,7 @@ export default class ListingModel extends Model {
     super.register('get-by-list-date', get_listing_by_list_date_query, listing => [listing.min, listing.max])
     super.register('get-by-game', get_listing_by_game, listing => [listing.game])
     super.register('delete-listings-by-userid', delete_listings_by_userid, l => [l.userId])
+    super.register('marketpricereport', market_price_report, l => [l.year, l.itemId])
   }
 
   /**
@@ -117,6 +133,10 @@ export default class ListingModel extends Model {
    */
   async deleteAllListingsOfUser(userId: number): Promise<void> {
     await this.execute('delete-listings-by-userid', { userId })
+  }
+
+  async marketPriceReport(year: number, itemId: number): Promise<{ itemName: string, gameName: string, price: number, id: number }[]> {
+    return await this.execute('marketpricereport', { year, itemId }) as { itemName: string, gameName: string, price: number, id: number }[]
   }
 }
 

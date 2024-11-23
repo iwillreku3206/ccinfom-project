@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 
@@ -12,20 +11,44 @@
   <main class="center-container">
     <div class="window" style="width: 300px">
       <div class="title-bar">
-        <div class="title-bar-text">Admin Control Panel</div>
+        <div class="title-bar-text">Market Price Report</div>
         <div class="title-bar-controls">
-          <button aria-label="Close" onclick="location.href='/home'"></button>
+          <button aria-label="Close" onclick="location.href='/admin/reports'"></button>
         </div>
       </div>
       <div class="window-body" style="background: white">
-        <div class="menu-container">
-          <a href="/admin/users" class="menu-item"><img src="/assets/user.png" alt="" class="menu-icon">
-            <span class="menu-text">Manage Users</span></a>
-          <a href="/game/manage" class="menu-item"><img src="/assets/games.png" alt="" class="menu-icon">
-            <span class="menu-text">Manage Games</span></a>
-          <a href="/item/manage" class="menu-item"><img src="/assets/folder.png" alt="" class="menu-icon">
-            <span class="menu-text">Manage Items</span></a>
-      </div>
+        Market Price Report for: {{itemName}} from {{gameName}}
+        <br>
+        <fieldset>
+          <legend>Sales</legend>
+          <table>
+            <thead>
+              <tr>
+                <th>Listings Number</th>
+                <th>Sale Price</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#listings}}
+              <tr>
+                <td>{{id}}</td>
+                <td>{{price}}</td>
+                <td>{{date}}</td>
+              </tr>
+              {{/listings}}
+            </tbody>
+          </table>
+        </fieldset>
+        <fieldset>
+          <legend>Statistics</legend>
+          <div>
+            Number of listings: {{len}} <br>
+            Total value: {{total}} <br>
+            Average value: {{average}} <br>
+
+          </div>
+        </fieldset>
       </div>
       <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
     </div>
