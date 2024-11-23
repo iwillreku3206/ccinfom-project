@@ -69,6 +69,17 @@ const get_all_items_with_game_name = `
         ON      g.id = i.game;
 `
 
+const get_items_with_game_name_from_id = `
+    SELECT      i.id AS id,
+                i.name AS name,
+                i.description AS description,
+                g.name AS game
+    FROM        \`items\` i
+    JOIN        games g
+        ON      g.id = i.game
+    WHERE       i.id = ?;
+`
+
 export default class ItemModel extends Model {
   static #instance: ItemModel
 
@@ -88,6 +99,7 @@ export default class ItemModel extends Model {
     super.register('get-all-with-gamename', get_all_items_with_game_name, _ => [])
     super.register('get-by-game', get_items_by_game_query, item => [item.game])
     super.register('delete', delete_item_query, item => [item.id])
+    super.register('get_items_with_game_name_from_id ', get_items_with_game_name_from_id, item => [item.id])
   }
 
   public async createItem(item: create_item_spec) {
@@ -104,6 +116,13 @@ export default class ItemModel extends Model {
     return results.map((r: RowDataPacket) => (r as (Omit<IItem, "game"> & { game: string })))
   }
 
+  public async getItemWithGameNameById(id: number): Promise<(Omit<IItem, "game"> & { game: string }) | null> {
+    const results = await super.execute<RowDataPacket[]>("get-all-with-gamename", { id })
+    if (results.length < 0) {
+      return null
+    }
+    return results.map((r: RowDataPacket) => (r as (Omit<IItem, "game"> & { game: string })))[0]
+  }
 
   public async getItemByName(item: get_item_by_name_spec): Promise<IItem | null> {
     const results = await super.execute<RowDataPacket[]>("get-by-name", item)
