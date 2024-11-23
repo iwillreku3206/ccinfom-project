@@ -20,7 +20,7 @@
 	
 					<fieldset>
 						<legend>Enter search terms</legend>
-						<form method="POST" action="/games">
+						<form method="POST" action="/game">
 							<label for="name">Search by name</label>
 							<input type="text" name="name" id="name" placeholder="none" value="">
 							<br>
@@ -74,7 +74,7 @@
 				tr().class('table-row').append(
 					td().text(game.name),
 					td().text(game.description),
-					td().append(button().stl({ color: 'blue' }).text('view')).listen('click', () => (location.href = '/games/game?game=' + game.name)),
+					td().append(button().stl({ color: 'blue' }).text('view')).listen('click', () => (location.href = '/game/instance?game=' + game.name)),
 					br()
 				)
 			)

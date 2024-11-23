@@ -32,13 +32,13 @@ gameRouter.get('/', async (req: Request, res: Response) => {
   })
 })
 
-gameRouter.get('/game', async (req: Request, res: Response) => {
+gameRouter.get('/instance', async (req: Request, res: Response) => {
   const { user, model, error } = res.locals;
   const { game } = req?.query ?? {};
 
   // Grab the games then render
   const gameData = await model.getGame({ name: game })
-  if(!gameData) return res.redirect('/game?error=gamenotfound')
+  if(!gameData) return res.redirect('/instance?error=gamenotfound')
   
   // Grab listings
   const items = await ItemModel.instance.getItemsByGame({ game: gameData.id });
@@ -57,7 +57,7 @@ gameRouter.get('/game', async (req: Request, res: Response) => {
 gameRouter.post('/', async (req: Request, res: Response) => {
   const { user, model, error } = res.locals;
   const name = req?.body?.name;
-  res.redirect("/games?name=" + name)
+  res.redirect("/game?name=" + name)
 })
 
 gameRouter.get('/manage', async (req: Request, res: Response) => {
@@ -65,7 +65,7 @@ gameRouter.get('/manage', async (req: Request, res: Response) => {
   const name = req?.body?.name;
 
   if (user?.userType == 'basic')
-    return res.redirect('/games?error=adminsonly')
+    return res.redirect('/game?error=adminsonly')
 
   // Grab the games then render
   const games = (!name || name.trim() == '')
@@ -81,14 +81,14 @@ gameRouter.get('/manage', async (req: Request, res: Response) => {
   })
 })
 
-gameRouter.post('/manage', async (req: Request, res: Response) => {
+gameRouter.post('/create', async (req: Request, res: Response) => {
   const { user, model, error } = res.locals;
   const name = req?.body?.name;
   
   try {
     await model.createGame({ name: req.body.name, description: req.body.description })
   } catch (error) {
-    res.redirect("/games/manage?error=" + error)
+    res.redirect("manage?error=" + error)
   }
-  res.redirect("/games/manage")
+  res.redirect("manage")
 })

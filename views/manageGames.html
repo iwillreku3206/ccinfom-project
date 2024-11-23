@@ -19,7 +19,7 @@
             <div class="window-body">
                 <fieldset>
                     <legend>Specify the game details</legend>
-                    <form method="POST" action="/games/manage">
+                    <form method="POST" action="/game/create">
                         <div class="field-row">
                             <label for="name">Game Name</label>
                             <input type="text" id="name" name="name" required />
@@ -73,8 +73,8 @@
 				tr().class('table-row').append(
 					td().text(game.name),
 					td().text(game.description),
-					td().append(button().stl({ color: 'blue' }).text('view')).listen('click', () => (location.href = '/games/game?game=' + game.name)),
-					td().append(button().stl({ color: 'blue' }).text('delete')).listen('click', () => (location.href = '/games/game?DELETEGAME')),
+					td().append(button().stl({ color: 'blue' }).text('view')).listen('click', () => (location.href = '/game/instance?game=' + game.name)),
+					td().append(button().stl({ color: 'blue' }).text('delete')).listen('click', () => (location.href = '/game/instance?DELETEGAME')),
 					br()
 				)
 			)
