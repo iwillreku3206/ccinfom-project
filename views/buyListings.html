@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Vapor Community Market</title>
+  <link rel="stylesheet" href="/assets/xp.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/assets/datepicker.css">
+  <link rel="stylesheet" href="/assets/datepicker.js">
+</head>
+
+<body>
+  <main class="center-container">
+    <div class="window" style="width: 300px">
+      <div class="title-bar">
+        <div class="title-bar-text">Vapor Market - Buy Listed Items</div>
+				<div class="title-bar-controls">
+          <button aria-label="Close" onclick="location.href='/home'"></button>
+        </div>
+      </div>
+      <div class="window-body" style="background: white">
+                <fieldset>
+                    <legend>Your Infomation:</legend>
+                    <p>Name: <span id="mesUsername"></span></p>
+                    <p>Balance: $ <span id="mesBalance">0</span></p>
+                    
+                </fieldset>
+				<fieldset>
+					<legend>Enter filter details</legend>
+					<form method="POST" action="/listing/buy/getListings">
+						<label for="item">Filter by item</label>
+						<input type="text" name="item" id="item" placeholder="none" value="">
+						
+						<label for="seller">Filter by seller</label>
+						<input type="text" name="seller" id="seller" placeholder="none" value="">
+						
+						<label>Price</label>
+						<input type="text" name="pricemin" id="pricemin" placeholder="0" value="" style="width:20%"></input>
+						-
+						<input type="text" name="pricemax" id="pricemax" placeholder="INF" value="" style="width:20%"></input>
+	
+						<label>Date</label>
+						<input type="text" id="visual-datemin" placeholder="start" style="width:20%"></input>
+						-
+						<input type="text" id="visual-datemax" placeholder="end" style="width:20%"></input>
+
+						<!-- Hidden fields for actual values -->
+						<input type="text" name="datemin" id="datemin" placeholder="start" style="width:20%; display: none;"></input>
+						<input type="text" name="datemax" id="datemax" placeholder="end" style="width:20%; display: none;"></input>
+
+						<br>
+						<br>
+						
+						<section class="field-row form-buttons">
+							<button type="reset">Reset</button>
+							<button type="submit">Filter</button>
+						</section>
+					</form>
+					<p class="error">{{error}}</p>
+				</fieldset>
+				<fieldset>
+                    <legend>On Cart</legend>
+                    <p>Buying: <p><span style="color: red" id="mesError"></span></p></p>
+                    <form method="POST" action="/listing/buy/">
+                        <table class="table" id="onCart">
+	
+                        </table>
+                        <section class="field-row form-buttons">
+							<button type="reset">Remove</button>
+							<button type="submit">Buy</button>
+						</section>
+                    </form>
+                </fieldset>
+				<fieldset style=" height: 500px">
+					<legend>Listings</legend>
+                    <div style="overflow-y: auto; overflow-x: auto; max-height: 500px">
+                        <table class="table" id="onListings">
+	
+                        </table>
+                    </div>
+					
+				</fieldset>
+      </div>
+      <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
+    </div>
+  </main>
+
+	<script src="/assets/utils.js"></script>
+	<script type="module">
+
+		import '/assets/datepicker.js'
+        // User Info
+        const mes_username = DOM.select(".mesUsername")
+        const mes_balance  = DOM.select(".mesBalance")
+        const mes_error    = DOM.select(".mesError")
+
+		// Create date picker
+		const visual_datemin = DOM.select('#visual-datemin')
+		const visual_datemax = DOM.select('#visual-datemax')
+
+		const datemin = DOM.select('#datemin')
+		const datemax = DOM.select('#datemax')
+		
+		const date_start_picker = datepicker(visual_datemin, { 
+			onSelect: () => (datemin.value = new Date(visual_datemin.value).getTime())
+		})
+		const date_end_picker = datepicker(visual_datemax, { 
+			onSelect: () => (datemax.value = new Date(visual_datemax.value).getTime())  
+		})
+
+		// DOM stuff we'll use
+		const listings = JSON.parse('{{{listingData}}}');
+		const table = DOM.select('#onListings')
+
+		// The new elements we'll use
+		const button = () => DOM.element('button')
+		const tr = () => DOM.element('tr')
+		const td = () => DOM.element('td')
+		const th = () => DOM.element('th')
+		const br = () => DOM.element('br')
+
+        function createButtonWithArray(buttonText, ...itemsToAdd) {
+            // Create a button element
+            const button = document.createElement('button');
+            button.textContent = buttonText;
+        
+            // Add the click event listener
+            button.onclick = function () {
+              // Append items to the onCart array
+              onCart.push(...itemsToAdd);
+        
+              // Display the updated list
+              updateDisplay();
+            };
+        
+            // Add the button to the button-container div
+            document.getElementById('button-container').appendChild(button);
+          }
+  
+          function updateDisplay() {
+              const listContainer = document.getElementById('list-container');
+              listContainer.innerHTML = ''; // Clear previous list
+          
+              // Create a new list
+              const list = document.createElement('ul');
+              onCart.forEach(item => {
+                  const listItem = document.createElement('li');
+                  listItem.textContent = item;
+                  list.appendChild(listItem);
+              });
+          
+              listContainer.appendChild(list);
+          }
+
+		// Adds the headers of the table
+		table.append(
+			tr().append(
+				th().txt('Listing ID'),
+				th().txt('Item ID'),
+				th().txt('Price'),
+				th().txt('Seller ID'),
+				th()
+			)
+		)
+
+		/**
+			* Maps each listing to a table row.
+			*/
+		const listing_mapper = (listing) => (
+			tr().class('table-row').append(
+				td().txt(listing.id),
+				td().txt(listing.item),
+				td().txt(listing.price),
+				td().txt(listing.seller),
+				td().append(createButtonWithArray('Add to Cart', {
+                    listing_id: listing.id,
+                    listing_item: listing.item,
+                    listing_price: listing.price,
+                    listing_seller: listing.seller
+                })),
+				br()
+			)
+		)
+
+		listings.map(listing_mapper).map(e => table.append(e))
+        
+        if (items.length ==0) {
+            visual_error.innerText = "No Items."
+        } else if (mustache_message.length > 0){
+            visual_error.value = mustache_message
+        }
+
+        const onCart = [];
+
+        
+
+    </script>
+</body>
+
+</html>
