@@ -25,6 +25,7 @@
         </div>
       </div>
       <div class="window-body" style="background: white">
+        <div style="color:red;">{{error}}</div>
         <fieldset>
           <legend>Filters</legend>
           <form action="/admin/users" method="get">
@@ -59,14 +60,11 @@
               <td>{{userType}}</td>
               <td>{{balance}}</td>
               <td>
+                <a role="button" href="/profile?username={{username}}">View Profile</a>
                 <form action="/admin/users/delete" method="post"
-                  onsubmit="return confirm('This will delete all of the user\'s items, listings and sessions). Continue?">
+                  onsubmit="return confirm('This will delete all of the user\'s items, listings and sessions. Continue?')">
                   <input type="hidden" name="id" value="{{id}}">
                   <button type="submit">Delete</button>
-                </form>
-                <form action="/admin/users/force-logout" method="post">
-                  <input type="hidden" name="id" value="{{id}}">
-                  <button type="submit">Force Logout</button>
                 </form>
               </td>
             </tr>
