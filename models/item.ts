@@ -76,44 +76,24 @@ export default class ItemModel extends Model {
     if (!ItemModel.#instance) {
       ItemModel.#instance = new ItemModel()
     }
-    
+
     return ItemModel.#instance
   }
-
-  private constructor() {
-        super()
-        super.register('create', create_item_query, item => [ item.name, item.description, item.game ])
-        super.register('get-all', get_all_items, _ => [])
-        super.register('get-by-name', get_item_by_name_query, item => [ item.name ])
-        super.register('get-by-game', get_items_by_game_query, item => [ item.game ])
-        super.register('delete', delete_item_query, item => [ item.id ])
-    }
 
   private constructor() {
     super()
     super.register('create', create_item_query, item => [item.name, item.description, item.game])
     super.register('get-all', get_all_items, _ => [])
-    super.register('get-all-with-gamename', get_all_items_with_game_name, _ => [])
     super.register('get-by-name', get_item_by_name_query, item => [item.name])
+    super.register('get-all-with-gamename', get_all_items_with_game_name, _ => [])
     super.register('get-by-game', get_items_by_game_query, item => [item.game])
+    super.register('delete', delete_item_query, item => [item.id])
   }
 
   public async createItem(item: create_item_spec) {
     await super.execute('create', item as SQLValueList)
   }
 
-  public async getItemByName(item: get_item_by_name_spec): Promise<IItem | null> {
-    const results = await super.execute<RowDataPacket[]>("get-by-name", item)
-    
-    if (results.length < 1) {
-      return null
-    }
-    
-    if (!results[0].id || !results[0].name || !results[0].description || !results[0].game) {
-      log.error("Invalid item: ", JSON.stringify(results[0]))
-      return null
-    }
-  }
   public async getAllItems(): Promise<IItem[]> {
     const results = await super.execute<RowDataPacket[]>("get-all", {})
     return results.map((r: RowDataPacket) => (r as IItem))
@@ -139,7 +119,7 @@ export default class ItemModel extends Model {
 
     return results[0] as IItem
   }
-  
+
   public async deleteItem(item: delete_item) {
     await super.execute('delete', {})
   }
