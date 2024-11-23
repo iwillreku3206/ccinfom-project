@@ -11,7 +11,7 @@
 		<main class="center-container">
 			<div class="window" style="width: 300px">
 				<div class="title-bar">
-					<div class="title-bar-text">Vapor Market - Games</div>
+					<div class="title-bar-text">Vapor Market - Game Info</div>
 					<div class="title-bar-controls">
 						<button aria-label="Close" onclick="location.href='/home'"></button>
 					</div>
@@ -19,23 +19,12 @@
 				<div class="window-body" style="background: white">
 	
 					<fieldset>
-						<legend>Enter search terms</legend>
-						<form method="POST" action="/games">
-							<label for="name">Search by name</label>
-							<input type="text" name="name" id="name" placeholder="none" value="">
-							<br>
-							<br>
-							
-							<section class="field-row form-buttons">
-								<button type="reset">Reset</button>
-								<button type="submit">Filter</button>
-							</section>
-						</form>
-						<p class="error">{{error}}</p>
+						<legend>{{game}}</legend>
+						<p>{{description}}</p>
 					</fieldset>
 					
 					<fieldset>
-						<legend>Games</legend>
+						<legend>Items</legend>
 						<table class="table">
 		
 						</table>
@@ -48,7 +37,7 @@
 		<script>
 
 			// DOM stuff we'll use
-			const games = JSON.parse('{{{gameData}}}');
+			const items = JSON.parse('{{{itemData}}}');
 			const table = DOM.select('.table')
 
 			// The new elements we'll use
@@ -61,7 +50,7 @@
 			// Adds the headers of the table
 			table.append(
 				tr().append(
-					th().text('Game'),
+					th().text('Item'),
 					th().text('Description'),
 					th()
 				)
@@ -70,16 +59,16 @@
 			/**
 				* Maps each games to a table row.
 				*/
-			const game_mapper = (game) => (
+			const item_mapper = (item) => (
 				tr().class('table-row').append(
-					td().text(game.name),
-					td().text(game.description),
-					td().append(button().stl({ color: 'blue' }).text('view')).listen('click', () => (location.href = '/games/game?game=' + game.name)),
+					td().text(item.name),
+					td().text(item.description),
+					td().append(button().stl({ color: 'blue' }).text('view')),
 					br()
 				)
 			)
 
-			games.map(game_mapper).map(e => table.append(e))
+			items.map(item_mapper).map(e => table.append(e))
 		</script>
 	</body> 
 

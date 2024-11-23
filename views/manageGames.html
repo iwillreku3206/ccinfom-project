@@ -73,7 +73,8 @@
 				tr().class('table-row').append(
 					td().text(game.name),
 					td().text(game.description),
-					td().append(button().stl({ color: 'blue' }).text('edit')),
+					td().append(button().stl({ color: 'blue' }).text('view')).listen('click', () => (location.href = '/games/game?game=' + game.name)),
+					td().append(button().stl({ color: 'blue' }).text('delete')).listen('click', () => (location.href = '/games/game?DELETEGAME')),
 					br()
 				)
 			)

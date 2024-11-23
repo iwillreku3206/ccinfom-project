@@ -30,14 +30,14 @@ const get_item_by_name_query = `
 `
 
 const get_items_by_game_query = `
-    SELECT      id,
-                name,
-                description,
-                game
+    SELECT      i.id,
+                i.name,
+                i.description,
+                i.game
     FROM        \`items\` i
     JOIN        \`games\` g
     ON          i.game = g.id
-    AND         g.name = ?;
+    AND         g.id = ?;
 `
 
 const get_all_items = `
@@ -63,7 +63,7 @@ export default class ItemModel extends Model {
         super()
         super.register('create', create_item_query, item => [ item.name, item.description, item.game ])
         super.register('get-by-name', get_item_by_name_query, item => [ item.name ])
-        super.register('get-by-game', get_items_by_game_query, item => [ item.gameName ])
+        super.register('get-by-game', get_items_by_game_query, item => [ item.game ])
     }
 
     public async createItem(item: create_item_spec) {
