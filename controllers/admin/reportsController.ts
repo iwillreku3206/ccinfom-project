@@ -64,6 +64,11 @@ reportsRouter.get('/itemsListed', async (req, res) => {
   const { user } = res.locals;
   const items = await ItemModel.instance.getAllItemsWithGameName()
   render(res, "reports/itemsListedReportOptions", {
+    username: user?.username,
+    displayName: user?.displayName || user?.username,
+    items,
+    error: req.query.error || ''
+  })
 })
 reportsRouter.get('/activeCount', async (req, res) => {
   const { user } = res.locals;
@@ -75,7 +80,7 @@ reportsRouter.get('/activeCount', async (req, res) => {
     error: req.query.error || ''
   })
 })
-  
+
 reportsRouter.get('/itemsListedReport', async (req, res) => {
   const { user } = res.locals;
 
