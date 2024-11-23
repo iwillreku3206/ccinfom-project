@@ -61,7 +61,7 @@
 					</table>
 				</fieldset>
       </div>
-      <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
+      <div class="status-bar">Signed in as {{displayName}}</div>
     </div>
   </main>
 
@@ -74,6 +74,7 @@
 		const visual_datemin = DOM.select('#visual-datemin')
 		const visual_datemax = DOM.select('#visual-datemax')
 
+		const username = '{{username}}';
 		const datemin = DOM.select('#datemin')
 		const datemax = DOM.select('#datemax')
 		
@@ -115,6 +116,10 @@
 				td().txt(listing.item),
 				td().txt(listing.price),
 				td().txt(listing.seller),
+				td().append(button().stl({ color: 'blue' }).txt('buy'))
+					.listen('click', () => 
+						DOM.post('/listing/buy', { listing_id: listing })
+							.then(() => location.href = './userinventoryitems/' + username)),
 				td().append(button().stl({ color: 'red' }).txt('delete')),
 				br()
 			)
