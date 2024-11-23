@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-16 10:43:56
- * @ Modified time: 2024-11-23 20:08:24
+ * @ Modified time: 2024-11-23 20:18:39
  * @ Description:
  * 
  * Manages mapping listings to runtime objects.
@@ -166,7 +166,7 @@ export default class ListingModel extends Model {
     await UserModel.instance.subtractBalance({ id: listing.buyer_id, balance: sold.price })
 
     // Adds the price of the item from the balance of the user
-    await UserModel.instance.addBalance({ id: listing.buyer_id, balance: sold.price })
+    await UserModel.instance.addBalance({ id: sold.seller, balance: sold.price })
   }
 
   /**
