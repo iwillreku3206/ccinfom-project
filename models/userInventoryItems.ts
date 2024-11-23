@@ -2,6 +2,7 @@ import argon2 from 'argon2'
 import log from "log"
 import { type ResultSetHeader, type RowDataPacket } from "mysql2"
 import { db } from "../app/database"
+import Model from "./model";
 
 export interface UserInventoryItems{
   id: number,
@@ -10,23 +11,14 @@ export interface UserInventoryItems{
   obtained_on: Date
 }
 
+// all queries
 const SQLCODE = Object.freeze({
-  ADDITEM        : `INSERT INTO \`inventory_items\`
-                    (user, item, obtained_on)
-                    VALUES (?, ?, ?);`
-  , SELUSERITEM  : `SELECT      id, user, item,obtained_on
-                    FROM        \`inventory_id\`
-                    WHERE       user = ? 
-                    AND   item = ?`
-  , SELUSER      : `SELECT      id, user, item, obtained_on
-                    FROM        \`inventory_items\`
-                    WHERE       user = ?;`
-  , UPDUSER      : `UPDATE  \`inventory_items\` 
-                    SET   user = ?
-                    ON    id = ?;`
-  , UPDITEM      : `UPDATE  \`inventory_items\` 
-                    SET   item = ?
-                    ON    id = ?;`
+  create            : `INSERT INTO \`inventory_items\` (user, item, obtained_on) VALUES (?, ?, ?);`
+  , get_all         : `SELECT id, user, item, obtained_on FROM \`inventory_items\`;`
+  , get_user        : `SELECT id, user, item, obtained_on FROM \`inventory_items\` WHERE user = ?;`
+  , get_user_item   : `SELECT id, user, item, obtained_on FROM \`inventory_items\` WHERE user = ? AND item = ?;`
+  , get_item        : `SELECT id, user, item, obtained_on FROM \`inventory_items\` WHERE item = ?;` 
+  , get_date        : `SELECT id, user, item, obtained_on FROM \`inventory_items\` WHERE obtained_on BETWEEN ? AND ?;` 
 })
 
 /**
@@ -38,99 +30,78 @@ function isInvalidInventoryItem(item: any){
   return !("id" in item) || !("user" in item) || !("item" in item) || !("obtained_on" in item)
 }
 
-/**
- * Adds new inventory items
- * @param item Item with user and item
- * @returns Promise<UserInventoryItems>
- */
-export async function addInventoryItem(item: Omit<UserInventoryItems, 'id' | 'obtained_on'>): Promise<UserInventoryItems>{
-  let date_added = new Date();
+// The model to use
+export default class UserInventoryItemModel extends Model {
+  static #instance: UserInventoryItemModel
 
-  const [results, _] = await db.execute<ResultSetHeader>(SQLCODE["ADDITEM"], [item.user, item.item, date_added])
+  public static get instance(): UserInventoryItemModel {
+    if (!UserInventoryItemModel.#instance) {
+      UserInventoryItemModel.#instance = new UserInventoryItemModel()
+    }
 
-  return {
-    id: results.insertId,
-    obtained_on: date_added,
-    ...item,
-  }
-}
-
-/**
- * Returns an array of UserInventoryItems that fits the description
- * @param userId number - user id to select from
- * @param itemId number - item id to select from
- * @returns Promise<UserInventoryItems[] | null>{
- */
-export async function getInventoryItemByUserIdAndItemId(userId: number, itemId: number): Promise<UserInventoryItems[] | null>{
-  const [results, _] = await db.execute<RowDataPacket[]>(SQLCODE["SELUSERITEM"], [userId, itemId])
-
-  console.log(results)
-
-  if (results.length < 1) {
-    log.error("no item")
-    return null
+    return UserInventoryItemModel.#instance
   }
 
-  const invalid_items = results.filter(isInvalidInventoryItem)
-  const valid_items = results.filter(x => !invalid_items.includes(x))
-
-  if (invalid_items.length >= 1){
-    log.error("Invalid user inventory item: ", JSON.stringify(invalid_items))
-    return null
-  }
-  
-  return valid_items as UserInventoryItems[]
-}
-
-
-/**
- * Returns an array of UserInventoryItems that fits the given userId
- * @param userId number - user id to select from
- * @returns Promise<UserInventoryItems[] | null>{
- */
-export async function getInventoryItemByUserId(userId: number): Promise<UserInventoryItems[] | null>{
-  const [results, _] = await db.execute<RowDataPacket[]>(SQLCODE["SELUSER"], [userId])
-
-  console.log(results)
-
-  if (results.length < 1) {
-    log.error("no item")
-    return null
+  private constructor() {
+    super()
+    // Register the queries
+    super.register('create', SQLCODE[`create`], inventoryitem => [inventoryitem.user, inventoryitem.item, inventoryitem.date_added])
+    super.register('get-all', SQLCODE[`get_all`], _ => [])
+    super.register('get-by-user', SQLCODE[`get_user`], inventoryitem => [inventoryitem.user])
+    super.register('get-by-user-and-item', SQLCODE[`get_user_item`], inventoryitem => [inventoryitem.user, inventoryitem.item])
+    super.register('get-by-item', SQLCODE[`get_item`], inventoryitem => [inventoryitem.item])
+    super.register('get-by-date', SQLCODE[`get_date`], inventoryitem => [inventoryitem.min, inventoryitem.max])
   }
 
-  const invalid_items = results.filter(isInvalidInventoryItem)
-  const valid_items = results.filter(x => !invalid_items.includes(x))
 
-  if (invalid_items.length >= 1){
-    log.error("Invalid user inventory item: ", JSON.stringify(invalid_items))
-    return null
-  }  
-  
-  return valid_items as UserInventoryItems[]
+  /**
+   * Adds new inventory items
+   * @param item Item with user and item
+   * @returns Promise<UserInventoryItems>
+   */
+  async createInventoryItem(item: Omit<UserInventoryItems, 'id'>): Promise<void>{
+     await this.execute("create", item)
+
+  }
+
+  /**
+   * Returns an array of UserInventoryItems that fits the description
+   * @param userId number - user id to select from
+   * @param itemId number - item id to select from
+   * @returns Promise<UserInventoryItems[] | null>{
+   */
+  async getFilteredInventoryItems(filter: string, ...values: any): Promise<UserInventoryItems[] | null>{
+    let results = null;
+
+    switch (filter) {
+      case 'user': results = await this.execute<RowDataPacket[]>('get-by-user', { user: values[0] }); break;
+      case 'user_and_item': results = await this.execute<RowDataPacket[]>('get-by-user-and-item', { user: values[0], item: values[1] }); break;
+      case 'item': results = await this.execute<RowDataPacket[]>('get-by-item', { item: values[0] }); break;
+      case 'date': results = await this.execute<RowDataPacket[]>('get-by-date', { min: values[0], max: values[1]}); break;
+    }
+
+    if (results?.length == 0) {
+      log.error("No Items")
+    }
+    
+    return results?.map((item: RowDataPacket) => (item as UserInventoryItems)) as UserInventoryItems[] ?? null
+  }
+
+
+  /**
+   * Returns an array of UserInventoryItems that fits the given userId
+   * @param userId number - user id to select from
+   * @returns Promise<UserInventoryItems[] | null>{
+   */
+  async getAllInventoryItems(): Promise<UserInventoryItems[]>{
+    let results = await super.execute<RowDataPacket[]>(`get-all`, {})
+    const itemList: UserInventoryItems[] = results.map((item: RowDataPacket) => (item as UserInventoryItems))
+    
+    return itemList
+  }
+
 }
 
-/**
- * Updates the given inventory item in the database to a new userId
- * @param inventoryId 
- * @param userId 
- */
-export async function updateUserIdByUserId(inventoryId: number, userId: number){
-  if (userId == 0) 
-    throw new Error("User id cannot be 0")
 
-  const [_, __] = await db.execute<ResultSetHeader>(SQLCODE["UPDUSER"], [userId, inventoryId])
 
-}
 
-/**
- * Updates the given inventory item in the database to a new itemId
- * @param inventoryId 
- * @param itemId 
- */
-export async function updateUserIdByItemId(inventoryId: number, itemId: number){
-  if (itemId == 0) 
-    throw new Error("Item id cannot be 0")
-  
-  const [_, __] = await db.execute<ResultSetHeader>(SQLCODE["UPDITEM"], [itemId, inventoryId])
-
-}
