@@ -11,42 +11,59 @@
   <main class="center-container">
     <div class="window" style="width: 300px">
       <div class="title-bar">
-        <div class="title-bar-text">Market Price Report</div>
+        <div class="title-bar-text">Active User Count Report</div>
         <div class="title-bar-controls">
           <button aria-label="Close" onclick="location.href='/admin/reports'"></button>
         </div>
       </div>
       <div class="window-body" style="background: white">
-        Market Price Report for: {{itemName}} from {{gameName}}
+        User login and activity report for: {{year}}
         <br>
         <fieldset>
-          <legend>Sales</legend>
+          <legend>Logins per month</legend>
           <table>
             <thead>
               <tr>
-                <th>Listings Number</th>
-                <th>Sale Price</th>
-                <th>Date</th>
+                <th>Month</th>
+                <th>Login Count</th>
               </tr>
             </thead>
             <tbody>
-              {{#listings}}
+              {{#loginCount}}
               <tr>
-                <td>{{id}}</td>
-                <td>{{price}}</td>
-                <td>{{date}}</td>
+                <td>{{month}}</td>
+                <td>{{count}}</td>
               </tr>
-              {{/listings}}
+              {{/loginCount}}
+            </tbody>
+          </table>
+        </fieldset>
+        <fieldset>
+          <legend>Active users per month</legend>
+          <table>
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th>Active User Count</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#activeUserCount}}
+              <tr>
+                <td>{{month}}</td>
+                <td>{{count}}</td>
+              </tr>
+              {{/activeUserCount}}
             </tbody>
           </table>
         </fieldset>
         <fieldset>
           <legend>Statistics</legend>
           <div>
-            Number of listings: {{len}} <br>
-            Total value: {{total}} <br>
-            Average value: {{average}} <br>
-
+            Number of users: {{ userCount }} <br>
+            Average monthly active user count: {{ averageActiveUsers }} <br>
+            Average monthly login count: {{ averageLoginCount }} <br>
+            Average active user rate: {{ activeUserRate }} %
           </div>
         </fieldset>
       </div>
