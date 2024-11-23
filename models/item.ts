@@ -1,4 +1,4 @@
-import { type RowDataPacket, type ResultSetHeader } from "mysql2"
+import { type RowDataPacket, type ResultSetHeader, type QueryResult } from "mysql2"
 import { db } from "../app/database"
 import Model, { type SQLValueList } from "./model"
 import log from "log"
@@ -12,7 +12,7 @@ export interface IItem {
 
 type create_item_spec = Omit<IItem, 'id'>
 type get_item_by_name_spec = Pick<IItem, 'name'>
-type get_items_by_game_spec = {gameId: number}
+type get_items_by_game_spec = { game: number }
 
 const create_item_query = `
     INSERT INTO \`items\` 
@@ -61,21 +61,17 @@ export default class ItemModel extends Model {
 
     private constructor() {
         super()
-
-        super
-            .register('create', create_item_query, item => [item.name, item.description, item.game])
-        super
-            .register('get-by-name', get_item_by_name_query, item => [item.name])
-        super
-            .register('get-by-game', get_items_by_game_query, item => [item.gameName])
+        super.register('create', create_item_query, item => [ item.name, item.description, item.game ])
+        super.register('get-by-name', get_item_by_name_query, item => [ item.name ])
+        super.register('get-by-game', get_items_by_game_query, item => [ item.gameName ])
     }
 
     public async createItem(item: create_item_spec) {
         await super.execute('create', item as SQLValueList)
     }
 
-    public async getItemByName(itemName: string): Promise<IItem | null> {
-        const results = await super.execute<RowDataPacket[]>("get-by-name", {itemName})
+    public async getItemByName(item: get_item_by_name_spec): Promise<IItem | null> {
+        const results = await super.execute<RowDataPacket[]>("get-by-name", item)
     
         if (results.length < 1) {
             return null
@@ -89,13 +85,11 @@ export default class ItemModel extends Model {
         return results[0] as IItem
     }
 
-    public async getItemsByGame(gameName: string): Promise<IItem | null> {
-        const results = await super.execute<RowDataPacket[]>("get-by-game", {gameName})
+    public async getItemsByGame(item: get_items_by_game_spec): Promise<IItem[] | null> {
+        const results = await super.execute<RowDataPacket[]>("get-by-game", item)
 
-        if (results.length < 1) {
+        if (results.length < 1)
             return null
-        }
-
-        return results[0] as IItem
+        return results.map((r: RowDataPacket) => (r as IItem))
     }
 }

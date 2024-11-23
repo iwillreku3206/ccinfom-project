@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-16 11:34:48
- * @ Modified time: 2024-11-23 05:03:51
+ * @ Modified time: 2024-11-23 11:44:55
  * @ Description:
  * 
  * A controller for the listings-related pages and functionality.
@@ -64,7 +64,7 @@ listingRouter.post('/view', async (req, res) => {
     : datemin?.length     ? model.getFilteredListings('list_date', parseInt(datemin), parseInt(datemax))
     : model.getAllListings()
   ))()
-  const listingData = JSON.stringify([])
+  const listingData = JSON.stringify(listings)
   render(res, 'viewListings', { listingData, error })
 })
 

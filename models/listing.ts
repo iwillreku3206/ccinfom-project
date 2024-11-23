@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-16 10:43:56
- * @ Modified time: 2024-11-23 01:50:47
+ * @ Modified time: 2024-11-23 12:16:52
  * @ Description:
  * 
  * Manages mapping listings to runtime objects.
@@ -23,6 +23,7 @@ export interface IListing {
 // Specs
 type create_listing_spec = Omit<IListing, 'id' | 'list_date' | 'sold'>
 type get_listing_spec = Partial<IListing>
+type get_listing_by_game_spec = { game: number }
 
 // The model queries
 const create_listing_query = `INSERT INTO \`listings\` (item, price, seller) VALUES (?, ?, ?);`;
@@ -31,6 +32,11 @@ const get_listing_by_item_query = `SELECT * FROM \`listings\` WHERE item = ?;`;
 const get_listing_by_price_query = `SELECT * FROM \`listings\` WHERE price BETWEEN ? AND ?;`;
 const get_listing_by_seller_query = `SELECT * FROM \`listings\` WHERE seller = ?;`;
 const get_listing_by_list_date_query = `SELECT * FROM \`listings\` WHERE list_date BETWEEN ? AND ?;`;
+const get_listing_by_game = `
+  SELECT * FROM \`listings\` l 
+    JOIN \`items\` i ON i.id = l.item 
+    JOIN \`games\` g ON g.id = i.game 
+    WHERE i.game = ?;`
 
 // The model to use
 export default class ListingModel extends Model {
@@ -55,6 +61,7 @@ export default class ListingModel extends Model {
     super.register('get-by-price', get_listing_by_price_query, listing => [ listing.min, listing.max ])
     super.register('get-by-seller', get_listing_by_seller_query, listing => [ listing.seller ])
     super.register('get-by-list-date', get_listing_by_list_date_query, listing => [ listing.min, listing.max ])
+    super.register('get-by-game', get_listing_by_game, listing => [ listing.game ])
   }
 
   /**
@@ -90,6 +97,14 @@ export default class ListingModel extends Model {
     }
 
     return results?.map((result: RowDataPacket) => (result as IListing)) ?? null;
+  }
+
+  /**
+   * Return the listings associated with a game.
+   */
+  async getGameListings(listing: get_listing_by_game_spec): Promise<IListing[] | null> {
+    const results = await this.execute<RowDataPacket[]>('get-by-game', listing)
+    return results.map((r: RowDataPacket) => (r as IListing))
   }
 }
 

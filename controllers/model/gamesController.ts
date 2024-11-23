@@ -14,36 +14,39 @@ gameRouter.use(errorHandler(new Map([
 
 gameRouter.get('/', async (req: Request, res: Response) => {
   const { user, model, error } = res.locals;
+  const name = req?.body?.name;
+
+  // Grab the games then render
+  const games = (!name || name.trim() == '')
+   ? await model.getAllGames()
+   : [ await model.getGame({ name }) ]
+  const gameData = JSON.stringify(games)
 
   render(res, "games", {
     username: user?.username, 
     displayName: user?.displayName || user?.username,
+    gameData,
     error
   })
 })
 
-gameRouter.get('/view', async (req: Request, res: Response) => {
+gameRouter.post('/', async (req: Request, res: Response) => {
   const { user, model, error } = res.locals;
-
-  render(res, "viewGames", {
-    username: user?.username, 
-    displayName: user?.displayName || user?.username,
-    gameData: JSON.stringify(await model.getAllGames()),
-    error
-  })
-})
-
-gameRouter.post('/view', async(req: Request, res: Response) => {
-  const { user, model, error } = res.locals;
-  const { name } = req.body;
+  const name = req?.body?.name;
 
   // Grab the games then render
-  const games = name.trim() == ''
-    ? await model.getAllGames()
-    : [ await model.getGame({ name }) ]
+  const games = (!name || name.trim() == '')
+   ? await model.getAllGames()
+   : [ await model.getGame({ name }) ]
   const gameData = JSON.stringify(games)
-  render(res, 'viewGames', { gameData, error })
-}) 
+
+  render(res, "games", {
+    username: user?.username, 
+    displayName: user?.displayName || user?.username,
+    gameData,
+    error
+  })
+})
 
 gameRouter.get('/add', async (req: Request, res: Response) => {
   const { user, model, error } = res.locals;
@@ -51,7 +54,7 @@ gameRouter.get('/add', async (req: Request, res: Response) => {
   if (user?.userType == 'basic')
     return res.redirect('/games?error=adminsonly')
 
-  render(res, "addGames", {
+  render(res, "manageGames", {
     username: user?.username, 
     displayName: user?.displayName || user?.username,
     error

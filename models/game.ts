@@ -1,12 +1,14 @@
 /**
  * @ Author: Group 1
  * @ Create Time: 2024-11-23 02:09:04
- * @ Modified time: 2024-11-23 04:09:53
+ * @ Modified time: 2024-11-23 12:07:50
  * @ Description:
  */
 
 import { type RowDataPacket, type ResultSetHeader } from "mysql2"
 import Model, { type SQLValueList } from "./model"
+import type { IItem } from "./item"
+import ItemModel from "./item"
 
 export interface IGame {
     id: number,
@@ -16,6 +18,7 @@ export interface IGame {
 
 type create_game_spec = Omit<IGame, 'id'>
 type get_game_by_name_spec = Pick<IGame, 'name'> 
+type get_game_by_id_spec = Pick<IGame, 'id'> 
 
 const create_game_query = `
     INSERT INTO \`games\` 
@@ -36,7 +39,8 @@ const get_all_games_query = `
     SELECT      id,
                 name,
                 description
-    FROM        \`games\`;
+    FROM        \`games\`
+    ;
 `
 
 export class GameModel extends Model {
@@ -89,5 +93,20 @@ export class GameModel extends Model {
         if (results.length < 1)
             return null
         return results[0] as IGame
+    }
+
+    /**
+     * Grabs all the game items.
+     * 
+     * @param game  Game to get items for.
+     * @returns     The items under the game. 
+     */
+    public async getGameItems(game: get_game_by_id_spec): Promise<IItem[] | null> {
+        const results = ItemModel.instance.getItemsByGame({ game: game.id })
+        return results
+    }
+
+    public async getGameListings() {
+
     }
 }
