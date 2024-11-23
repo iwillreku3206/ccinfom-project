@@ -33,9 +33,53 @@
                         </div>
                     </form>
                 </fieldset>
+                
+                <fieldset>
+                    <legend>Games</legend>
+                    <table class="table">
+    
+                    </table>
+                </fieldset>
                 </div>
             <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
         </div>
+        <script src="/assets/utils.js"></script>
+		<script>
+
+			// DOM stuff we'll use
+			const games = JSON.parse('{{{gameData}}}');
+			const table = DOM.select('.table')
+
+			// The new elements we'll use
+			const button = () => DOM.element('button')
+			const tr = () => DOM.element('tr')
+			const td = () => DOM.element('td')
+			const th = () => DOM.element('th')
+			const br = () => DOM.element('br')
+
+			// Adds the headers of the table
+			table.append(
+				tr().append(
+					th().text('Game'),
+					th().text('Description'),
+					th()
+				)
+			)
+
+			/**
+				* Maps each games to a table row.
+				*/
+			const game_mapper = (game) => (
+				tr().class('table-row').append(
+					td().text(game.name),
+					td().text(game.description),
+					td().append(button().stl({ color: 'blue' }).text('edit')),
+					br()
+				)
+			)
+
+			games.map(game_mapper).map(e => table.append(e))
+		</script>
     </main>
 </body> 
 
