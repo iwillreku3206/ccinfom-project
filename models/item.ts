@@ -13,6 +13,7 @@ export interface IItem {
 type create_item_spec = Omit<IItem, 'id'>
 type get_item_by_name_spec = Pick<IItem, 'name'>
 type get_items_by_game_spec = { game: number }
+type delete_item = Pick<IItem, 'id'>
 
 const create_item_query = `
     INSERT INTO \`items\` 
@@ -51,6 +52,11 @@ const get_all_items = `
                 game
     FROM        \`items\`;
 `
+const delete_item_query = `
+    DELETE
+    FROM        \`items\`
+    WHERE       id = ?;
+`
 
 export default class ItemModel extends Model {
     static #instance: ItemModel
@@ -69,6 +75,7 @@ export default class ItemModel extends Model {
         super.register('get-all', get_all_items, _ => [])
         super.register('get-by-name', get_item_by_name_query, item => [ item.name ])
         super.register('get-by-game', get_items_by_game_query, item => [ item.game ])
+        super.register('delete', delete_item_query, item => [ item.id ])
     }
 
     public async createItem(item: create_item_spec) {
@@ -79,7 +86,6 @@ export default class ItemModel extends Model {
         const results = await super.execute<RowDataPacket[]>("get-all", {})
         return results.map((r: RowDataPacket) => (r as IItem))
     }
-
 
     public async getItemByName(item: get_item_by_name_spec): Promise<IItem | null> {
         const results = await super.execute<RowDataPacket[]>("get-by-name", item)
@@ -102,5 +108,9 @@ export default class ItemModel extends Model {
         if (results.length < 1)
             return null
         return results.map((r: RowDataPacket) => (r as IItem))
+    }
+
+    public async deleteItem(item: delete_item) {
+        await super.execute('delete', {})
     }
 }

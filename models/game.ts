@@ -19,6 +19,7 @@ export interface IGame {
 type create_game_spec = Omit<IGame, 'id'>
 type get_game_by_name_spec = Pick<IGame, 'name'> 
 type get_game_by_id_spec = Pick<IGame, 'id'> 
+type delete_game_spec = Pick<IGame, 'id'>
 
 const create_game_query = `
     INSERT INTO \`games\` 
@@ -43,6 +44,12 @@ const get_all_games_query = `
     ;
 `
 
+const delete_game_query = `
+    DELETE 
+    FROM        \`games\`
+    WHERE       id = ?; 
+`
+
 export class GameModel extends Model {
     static #instance: GameModel
 
@@ -59,6 +66,7 @@ export class GameModel extends Model {
         super.register('create', create_game_query, game => [ game.name, game.description ])
         super.register('get-all', get_all_games_query, _ => [])
         super.register('get-by-name', get_game_by_name_query, game => [ game.name ])
+        super.register('delete', delete_game_query, game => [ game.id ])
     }
 
     /**
@@ -108,5 +116,9 @@ export class GameModel extends Model {
 
     public async getGameListings() {
 
+    }
+
+    public async deleteGame(game: delete_game_spec) {
+        await this.execute('delete', {})
     }
 }
