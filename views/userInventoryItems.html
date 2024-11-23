@@ -35,22 +35,55 @@
             <button type="submit">Submit</button>
           </section>
         </form>
-        <p>Items: </p>
-        <p style="color: red">{{error}}</p>
-        <p id="item_list">
-          <ul>
-            {{#items}}
-              <li>
-                <p><strong>Item</strong>: {{item}}</p>
-                <p><strong>Obtained On</strong>: {{obtained_on}}</p>
-              </li>
-            {{/items}}
-          </ul>
-        </p>
         <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
       </div>
     </div>
   </main>
+  <script>
+
+		// DOM stuff we'll use
+		const inventory = JSON.parse(`{{{inventoryData}}}`);
+		const table = DOM.select('.table')
+
+		// The new elements we'll use
+		const button = () => DOM.element('button')
+		const tr = () => DOM.element('tr')
+		const td = () => DOM.element('td')
+		const th = () => DOM.element('th')
+		const br = () => DOM.element('br')
+
+		// Adds the headers of the table
+		table.append(
+			tr().append(
+				th().txt('Item ID'),
+				th().txt('Item ID'),
+				th().txt('Price'),
+				th().txt('Seller ID'),
+				th()
+			)
+		)
+
+		/**
+			* Maps each listing to a table row.
+			*/
+		const listing_mapper = (listing) => (
+			tr().class('table-row').append(
+				td().txt(listing.id),
+				td().txt(listing.item),
+				td().txt(listing.price),
+				td().txt(listing.seller),
+				td().append(button().stl({ color: 'blue' }).txt('buy'))
+					.listen('click', () => DOM.post('/listing/buy', { listing_id: listing.id })
+					.then(data => data.json())
+					.then(data => location.href = '?error=' + data.error)),
+				br()
+			)
+		)
+
+		listings
+			.filter(listing => !listing.sold)
+			.map(listing_mapper).map(e => table.append(e))
+  </script>
 </body>
 
 

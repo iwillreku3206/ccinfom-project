@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-16 10:43:56
- * @ Modified time: 2024-11-23 20:23:20
+ * @ Modified time: 2024-11-23 20:54:00
  * @ Description:
  * 
  * Manages mapping listings to runtime objects.
@@ -44,6 +44,11 @@ const get_listing_by_game = `
 const create_sold_listing_query = `
   INSERT INTO \`sold_listings\` 
     (listing, buyer) VALUES (?, ?);
+`
+
+const create_inventory_query = `
+  INSERT INTO \`inventory_items\`
+    (item, user) VALUES (?, ?);
 `
 
 const update_sold_listing_by_id_query = `
@@ -98,6 +103,7 @@ export default class ListingModel extends Model {
     super.register('get-by-game', get_listing_by_game, listing => [listing.game])
     super.register('create-sold', create_sold_listing_query, sold => [sold.listing, sold.buyer])
     super.register('update-sold', update_sold_listing_by_id_query, sold => [sold.id])
+    super.register('create-inventory', create_inventory_query, inventory => [inventory.item, inventory.user])
     super.register('delete-listings-by-userid', delete_listings_by_userid, l => [l.userId])
     super.register('marketpricereport', market_price_report, l => [l.year, l.itemId])
   }
@@ -155,6 +161,9 @@ export default class ListingModel extends Model {
     // Get sold item
     const sold = await this.getListing({ id: listing.id })
     if(!sold) return;
+
+    // Register in user inventory
+    await this.execute('create-inventory', { item: sold.item, user: listing.buyer_id })
 
     // Create sold entry
     await this.execute('create-sold', { listing: sold?.id, buyer: listing.buyer_id  })
