@@ -7,6 +7,7 @@ import { which } from 'bun'
 import UserModel from '../../models/user'
 import SessionModel from '../../models/session'
 import { getMonthFromNumber } from '../../util/getMonthFromNumber'
+import { db } from '../../app/database'
 
 export const reportsRouter = express.Router()
 
@@ -101,3 +102,75 @@ reportsRouter.get('/activeCountReport', async (req, res) => {
   })
 })
 
+reportsRouter.get('/useritems', async (req, res) => {
+  const { user } = res.locals;
+  const items = await ItemModel.instance.getAllItemsWithGameName()
+  render(res, "reports/uiiReportOptions", {
+    username: user?.username,
+    displayName: user?.displayName || user?.username,
+    items,
+    error: req.query.error || ''
+  })
+})
+
+const totalUserItems = `
+  SELECT  COUNT(*) AS count
+  FROM    inventory_items;
+`
+
+const added = `
+  SELECT  g.name AS gameName,
+          i.name AS itemName,
+          COUNT(ii.id) AS count
+  FROM    past_inventory_items ii
+  JOIN    items i 
+      ON  i.id = ii.item
+  JOIN    games g 
+      ON  g.id = i.game
+  WHERE   YEAR(ii.lost_on) = ?
+  GROUP BY i.name
+  ORDER BY count DESC;
+`
+const removed = `
+  SELECT  g.name AS gameName,
+          i.name AS itemName,
+          COUNT(ii.id) AS count
+  FROM    inventory_items ii
+  JOIN    items i 
+      ON  i.id = ii.item
+  JOIN    games g 
+      ON  g.id = i.game
+  WHERE   YEAR(ii.obtained_on) = ?
+  GROUP BY i.name
+  ORDER BY count DESC;
+`
+
+reportsRouter.get('/userItemsReport', async (req, res) => {
+  const { user } = res.locals;
+
+  if (req.query.year == "")
+    res.redirect("/marketPrice?error=Invalid year")
+
+  const year = parseInt(String(req.query.year || "0000"))
+
+  //@ts-ignore
+  const count: number = (await db.execute(totalUserItems))[0][0].count
+  //@ts-ignore
+  const addedItems: any[] = (await db.execute(added, [year]))[0]
+  //@ts-ignore
+  const removedItems: any[] = (await db.execute(removed, [year]))[0]
+
+  const must = {
+    username: user?.username,
+    displayName: user?.displayName || user?.username,
+    count,
+    addedItems,
+    removedItems,
+    addedSum: sum(addedItems.map(a => a.count)),
+    removedSum: sum(removedItems.map(a => a.count)),
+    year
+  }
+  console.log(must)
+
+  render(res, "reports/uiiReport", must)
+})
