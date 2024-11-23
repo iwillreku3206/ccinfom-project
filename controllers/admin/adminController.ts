@@ -1,6 +1,7 @@
 import express from 'express'
 import { isAdmin, isLoggedIn } from '../../util/plugins'
 import { render } from '../../util/io'
+import { adminUserRouter } from './adminUserController'
 
 export const adminRouter = express.Router()
 
@@ -14,3 +15,4 @@ adminRouter.get('/', async (req, res) => {
     displayName: user?.displayName || user?.username 
   })
 })
+adminRouter.use('/users', adminUserRouter)
