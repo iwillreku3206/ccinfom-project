@@ -149,6 +149,11 @@ const getAllUsersByTypeAndUsernameQuery = `
   ORDER BY id;
 `
 
+const deleteUserQuery = `
+DELETE FROM \`users\`
+  WHERE id = ?;
+`
+
 
 export default class UserModel extends Model {
   static #instance: UserModel
@@ -183,6 +188,8 @@ export default class UserModel extends Model {
       .register('get-items', get_user_items_query, user => [user.username])
     super
       .register('get-users-by-type-username', getAllUsersByTypeAndUsernameQuery, user => [user.userType, user.userName])
+    super
+      .register('delete-user', deleteUserQuery, user => [user.userId])
   }
 
   public async createUser(user: create_user_spec) {
@@ -247,7 +254,8 @@ export default class UserModel extends Model {
 
     return users as Omit<IUser, "passwordHash">[]
   }
+
+  public async deleteUser(userId: number) {
+    await super.execute('delete-user', {userId})
+  }
 }
-
-
-

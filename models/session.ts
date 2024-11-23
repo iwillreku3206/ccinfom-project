@@ -43,6 +43,11 @@ const expire_session_query = `
     WHERE   id = ?;
 `
 
+const delete_all_sessions_by_user = `
+  DELETE FROM \`sessions\`
+    WHERE user = ?;
+`
+
 export default class SessionModel extends Model {
   static #instance: SessionModel
 
@@ -64,6 +69,8 @@ export default class SessionModel extends Model {
         login => [login.user, login.browser, login.platform])
     super
       .register('expire', expire_session_query, session => [session.id])
+    super
+      .register('delete-by-user', delete_all_sessions_by_user, session => [session.userId])
   }
 
   public async createSession(userId: number, userAgent: string, retries = 3): Promise<{
@@ -96,6 +103,10 @@ export default class SessionModel extends Model {
 
   public async expireSession(sessionId: string) {
     await super.execute('expire', { id: sessionId })
+  }
+
+  public async deleteUserSessions(userId: string) {
+    await super.execute('delete-by-user', { userId })
   }
 }
 

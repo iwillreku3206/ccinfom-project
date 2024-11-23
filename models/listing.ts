@@ -38,6 +38,10 @@ const get_listing_by_game = `
     JOIN \`games\` g ON g.id = i.game 
     WHERE i.game = ?;`
 
+const delete_listings_by_userid = `
+  DELETE FROM \`listings\`
+    WHERE seller = ?;
+`
 // The model to use
 export default class ListingModel extends Model {
   static #instance: ListingModel
@@ -55,13 +59,14 @@ export default class ListingModel extends Model {
    */
   private constructor() {
     super()
-    super.register('create', create_listing_query, listing => [ listing.item, listing.price, listing.seller ])
+    super.register('create', create_listing_query, listing => [listing.item, listing.price, listing.seller])
     super.register('get-all', get_listings_query, _ => [])
-    super.register('get-by-item', get_listing_by_item_query, listing => [ listing.item ])
-    super.register('get-by-price', get_listing_by_price_query, listing => [ listing.min, listing.max ])
-    super.register('get-by-seller', get_listing_by_seller_query, listing => [ listing.seller ])
-    super.register('get-by-list-date', get_listing_by_list_date_query, listing => [ listing.min, listing.max ])
-    super.register('get-by-game', get_listing_by_game, listing => [ listing.game ])
+    super.register('get-by-item', get_listing_by_item_query, listing => [listing.item])
+    super.register('get-by-price', get_listing_by_price_query, listing => [listing.min, listing.max])
+    super.register('get-by-seller', get_listing_by_seller_query, listing => [listing.seller])
+    super.register('get-by-list-date', get_listing_by_list_date_query, listing => [listing.min, listing.max])
+    super.register('get-by-game', get_listing_by_game, listing => [listing.game])
+    super.register('delete-listings-by-userid', delete_listings_by_userid, l => [l.userId])
   }
 
   /**
@@ -89,7 +94,7 @@ export default class ListingModel extends Model {
   async getFilteredListings(filter: string, ...values: any): Promise<IListing[] | null> {
     let results = null;
 
-    switch(filter) {
+    switch (filter) {
       case 'item': results = await this.execute<RowDataPacket[]>('get-by-item', { item: values[0] }); break;
       case 'price': results = await this.execute<RowDataPacket[]>('get-by-price', { min: values[0], max: values[1] }); break;
       case 'seller': results = await this.execute<RowDataPacket[]>('get-by-seller', { seller: values[0] }); break;
@@ -105,6 +110,13 @@ export default class ListingModel extends Model {
   async getGameListings(listing: get_listing_by_game_spec): Promise<IListing[] | null> {
     const results = await this.execute<RowDataPacket[]>('get-by-game', listing)
     return results.map((r: RowDataPacket) => (r as IListing))
+  }
+
+  /**
+   * Deletes all listings of a user
+   */
+  async deleteAllListingsOfUser(userId: number): Promise<void> {
+    await this.execute('delete-listings-by-userid', { userId })
   }
 }
 
