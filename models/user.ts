@@ -1,7 +1,6 @@
 import argon2 from "argon2"
 import { type RowDataPacket } from "mysql2"
 import Model, { type SQLValueList } from "./model"
- * @ Modified time: 2024-11-23 19:52:32
 import type { IListing } from "./listing"
 import type { UserInventoryItems } from "./userInventoryItems"
 import log from "log"
