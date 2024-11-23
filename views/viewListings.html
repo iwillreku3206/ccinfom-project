@@ -98,10 +98,10 @@
 		// Adds the headers of the table
 		table.append(
 			tr().append(
-				th().text('Listing ID'),
-				th().text('Item ID'),
-				th().text('Price'),
-				th().text('Seller ID'),
+				th().txt('Listing ID'),
+				th().txt('Item ID'),
+				th().txt('Price'),
+				th().txt('Seller ID'),
 				th()
 			)
 		)
@@ -111,11 +111,11 @@
 			*/
 		const listing_mapper = (listing) => (
 			tr().class('table-row').append(
-				td().text(listing.id),
-				td().text(listing.item),
-				td().text(listing.price),
-				td().text(listing.seller),
-				td().append(button().stl({ color: 'red' }).text('delete')),
+				td().txt(listing.id),
+				td().txt(listing.item),
+				td().txt(listing.price),
+				td().txt(listing.seller),
+				td().append(button().stl({ color: 'red' }).txt('delete')),
 				br()
 			)
 		)

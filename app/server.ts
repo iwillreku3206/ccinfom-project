@@ -8,6 +8,7 @@ import { gameRouter } from '../controllers/model/gamesController'
 import { listingRouter } from '../controllers/model/listingController'
 import { userInvItemsRouter } from '../controllers/model/uiiController'
 import { adminRouter } from '../controllers/admin/adminController'
+import { itemRouter } from '../controllers/model/itemController'
 
 export const app = express()
 
@@ -25,6 +26,7 @@ app.use("/auth", authRouter)
 app.use("/admin", adminRouter)
 app.use("/", rootRouter)
 app.use("/profile", profileRouter)
-app.use("/games", gameRouter)
+app.use("/game", gameRouter)
 app.use("/listing", listingRouter)
+app.use("/item", itemRouter)
 app.use("/userinventoryitems", userInvItemsRouter)
