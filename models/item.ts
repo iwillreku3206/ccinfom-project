@@ -20,6 +20,10 @@ const create_item_query = `
     VALUES (?, ?, ?);
 `
 
+const get_all_item_query = `
+    SELECT * FROM \`items\`;
+`
+
 const get_item_by_name_query = `
     SELECT      id,
                 name,
@@ -62,6 +66,7 @@ export default class ItemModel extends Model {
     private constructor() {
         super()
         super.register('create', create_item_query, item => [ item.name, item.description, item.game ])
+        super.register('get-all', get_all_items, _ => [])
         super.register('get-by-name', get_item_by_name_query, item => [ item.name ])
         super.register('get-by-game', get_items_by_game_query, item => [ item.game ])
     }
@@ -69,6 +74,12 @@ export default class ItemModel extends Model {
     public async createItem(item: create_item_spec) {
         await super.execute('create', item as SQLValueList)
     }
+
+    public async getAllItems(): Promise<IItem[]> {
+        const results = await super.execute<RowDataPacket[]>("get-all", {})
+        return results.map((r: RowDataPacket) => (r as IItem))
+    }
+
 
     public async getItemByName(item: get_item_by_name_spec): Promise<IItem | null> {
         const results = await super.execute<RowDataPacket[]>("get-by-name", item)

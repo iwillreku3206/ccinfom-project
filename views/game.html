@@ -50,8 +50,8 @@
 			// Adds the headers of the table
 			table.append(
 				tr().append(
-					th().text('Item'),
-					th().text('Description'),
+					th().txt('Item'),
+					th().txt('Description'),
 					th()
 				)
 			)
@@ -61,9 +61,9 @@
 				*/
 			const item_mapper = (item) => (
 				tr().class('table-row').append(
-					td().text(item.name),
-					td().text(item.description),
-					td().append(button().stl({ color: 'blue' }).text('view')),
+					td().txt(item.name),
+					td().txt(item.description),
+					td().append(button().stl({ color: 'blue' }).txt('view')),
 					br()
 				)
 			)
