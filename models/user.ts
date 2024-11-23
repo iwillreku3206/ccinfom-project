@@ -15,6 +15,7 @@ export interface IUser {
 };
 
 export interface IUserProfile {
+  id: number
   username: string,
   displayName: string,
   balance: number,

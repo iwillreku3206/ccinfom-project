@@ -33,7 +33,7 @@ const create_session_query = `
 `
 
 const create_login_query = `
-  INSERT INTO \`login_history\` (session, browser, platform)
+  INSERT INTO \`login_history\` (user, browser, platform)
     VALUES (?, ?, ?);
 `
 
@@ -61,7 +61,7 @@ export default class SessionModel extends Model {
         session => [session.id, session.userId, session.expiry])
     super
       .register('create-login', create_login_query,
-        login => [login.session, login.browser, login.platform])
+        login => [login.user, login.browser, login.platform])
     super
       .register('expire', expire_session_query, session => [session.id])
   }
@@ -82,7 +82,7 @@ export default class SessionModel extends Model {
       id, userId, expiry
     })
     const results2 = await super.execute<ResultSetHeader>('create-login', {
-      session: id, browser: ua.getBrowser().name || '', platform: ua.getOS().name || ''
+      user: userId, browser: ua.getBrowser().name || '', platform: ua.getOS().name || ''
     })
     if (results2.affectedRows < 1) {
       log.error("Unable to log user login to database")
