@@ -1,7 +1,7 @@
-import argon2 from 'argon2'
-import log from "log"
-import { type ResultSetHeader, type RowDataPacket } from "mysql2"
-import { db } from "../app/database"
+import argon2 from 'argon2';
+import log from "log";
+import { type ResultSetHeader, type RowDataPacket } from "mysql2";
+import { db } from "../app/database";
 import Model from "./model";
 
 export interface UserInventoryItems{
@@ -11,14 +11,83 @@ export interface UserInventoryItems{
   obtained_on: Date
 }
 
+export interface inventoryItems{
+  game_name: string,
+  user_name: string,
+  item_name: string,
+  item_description: string,
+  obtained_on: string,
+}
+
 // all queries
 const SQLCODE = Object.freeze({
   create            : `INSERT INTO \`inventory_items\` (user, item, obtained_on) VALUES (?, ?, ?);`
-  , get_all         : `SELECT id, user, item, obtained_on FROM \`inventory_items\`;`
-  , get_user        : `SELECT id, user, item, obtained_on FROM \`inventory_items\` WHERE user = ?;`
-  , get_user_item   : `SELECT id, user, item, obtained_on FROM \`inventory_items\` WHERE user = ? AND item = ?;`
-  , get_item        : `SELECT id, user, item, obtained_on FROM \`inventory_items\` WHERE item = ?;` 
-  , get_date        : `SELECT id, user, item, obtained_on FROM \`inventory_items\` WHERE obtained_on BETWEEN ? AND ?;` 
+  , get_all         : `SELECT 
+	g.name AS 'game_name',
+    u.username As 'user_name',
+    i.name AS 'item_name',
+    i.description AS 'item_description',
+    uii.obtained_on AS 'obtained_on'
+FROM \`inventory_items\` uii
+JOIN \`items\` i
+ON i.id = uii.id
+JOIN \`games\` g
+ON g.id = i.game
+JOIN \`users\` u
+ON u.id = uii.user;`
+  , get_user        : `SELECT 
+	g.name AS 'game_name',
+    u.username As 'user_name',
+    i.name AS 'item_name',
+    i.description AS 'item_description',
+    uii.obtained_on AS 'obtained_on'
+FROM \`inventory_items\` uii
+JOIN \`items\` i
+ON i.id = uii.id
+JOIN \`games\` g
+ON g.id = i.game
+JOIN \`users\` u
+ON u.id = uii.user WHERE user = ?;`
+  , get_user_item   : `SELECT 
+	g.name AS 'game_name',
+    u.username As 'user_name',
+    i.name AS 'item_name',
+    i.description AS 'item_description',
+    uii.obtained_on AS 'obtained_on'
+FROM \`inventory_items\` uii
+JOIN \`items\` i
+ON i.id = uii.id
+JOIN \`games\` g
+ON g.id = i.game
+JOIN \`users\` u
+ON u.id = uii.user WHERE user = ? AND item = ?;`
+  , get_item        : `SELECT 
+	g.name AS 'game_name',
+    u.username As 'user_name',
+    i.name AS 'item_name',
+    i.description AS 'item_description',
+    uii.obtained_on AS 'obtained_on'
+FROM \`inventory_items\` uii
+JOIN \`items\` i
+ON i.id = uii.id
+JOIN \`games\` g
+ON g.id = i.game
+JOIN \`users\` u
+ON u.id = uii.user WHERE item = ?;` 
+  , get_date        : `SELECT 
+	g.name AS 'game_name',
+    u.username As 'user_name',
+    i.name AS 'item_name',
+    i.description AS 'item_description',
+    uii.obtained_on AS 'obtained_on'
+FROM \`inventory_items\` uii
+JOIN \`items\` i
+ON i.id = uii.id
+JOIN \`games\` g
+ON g.id = i.game
+JOIN \`users\` u
+ON u.id = uii.user WHERE obtained_on BETWEEN ? AND ?;`
+  , 
 })
 
 /**
@@ -59,9 +128,8 @@ export default class UserInventoryItemModel extends Model {
    * @param item Item with user and item
    * @returns Promise<UserInventoryItems>
    */
-  async createInventoryItem(item: Omit<UserInventoryItems, 'id'>): Promise<void>{
+  public async createInventoryItem(item: Omit<UserInventoryItems, 'id'>): Promise<void>{
      await this.execute("create", item)
-
   }
 
   /**
@@ -70,7 +138,7 @@ export default class UserInventoryItemModel extends Model {
    * @param itemId number - item id to select from
    * @returns Promise<UserInventoryItems[] | null>{
    */
-  async getFilteredInventoryItems(filter: string, ...values: any): Promise<UserInventoryItems[] | null>{
+  public async getFilteredInventoryItems(filter: string, ...values: any): Promise<inventoryItems[] | null>{
     let results = null;
 
     switch (filter) {
@@ -80,11 +148,12 @@ export default class UserInventoryItemModel extends Model {
       case 'date': results = await this.execute<RowDataPacket[]>('get-by-date', { min: values[0], max: values[1]}); break;
     }
 
+    log.info(results)
     if (results?.length == 0) {
-      log.error("No Items")
+      log.warn("No Items")
     }
     
-    return results?.map((item: RowDataPacket) => (item as UserInventoryItems)) as UserInventoryItems[] ?? null
+    return results?.map((item: RowDataPacket) => (item as inventoryItems)) as inventoryItems[] ?? null
   }
 
 
@@ -93,9 +162,9 @@ export default class UserInventoryItemModel extends Model {
    * @param userId number - user id to select from
    * @returns Promise<UserInventoryItems[] | null>{
    */
-  async getAllInventoryItems(): Promise<UserInventoryItems[]>{
+  public async getAllInventoryItems(): Promise<inventoryItems[]>{
     let results = await super.execute<RowDataPacket[]>(`get-all`, {})
-    const itemList: UserInventoryItems[] = results.map((item: RowDataPacket) => (item as UserInventoryItems))
+    const itemList: inventoryItems[] = results.map((item: RowDataPacket) => (item as inventoryItems))
     
     return itemList
   }

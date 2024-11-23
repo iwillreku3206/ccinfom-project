@@ -21,24 +21,70 @@
       </div>
       <div class="window-body">
         
-        <p>Items: <span style="color: red">{{error}}</span></p> 
+        <p>Items: <span style="color: red" id="mesError"></span></p>
         
-        <p id="item_list">
-          <ul>
-            {{#items}}
-              <li>
-                <p><strong>Item</strong>: {{item}}</p>
-                <p><strong>Obtained On</strong>: {{obtained_on}}</p>
-              </li>
-            {{/items}}
-          </ul>
-        </p>
+        <table class="table">
+	
+        </table>
         
       </div>
       <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
     </div>
+    
   </main>
 </body>
+<script src="/assets/utils.js"></script>
+<script type="module">
+  const mustache_message = `{{{error}}}`;
+  const mustache_items    = `{{{items}}}`
+
+  const items = JSON.parse(mustache_items) 
+  const visual_error = document.getElementById("mesError")
+  const table = DOM.select('.table')
+
+  // The new elements we'll use
+  const button = () => DOM.element('button')
+  const tr = () => DOM.element('tr')
+  const td = () => DOM.element('td')
+  const th = () => DOM.element('th')
+  const br = () => DOM.element('br')
+
+  // Adds the headers of the table
+  table.append(
+    tr().append(
+      th().txt('Game Name'),
+      th().txt('Item Name'),
+      th().txt('Item ID'),
+      th().txt('Item Description'),
+      th().txt('Obtained On')
+    )
+  )
+
+  /**
+    * Maps each listing to a table row.
+    */
+  const listing_mapper = (listing) => (
+    console.log(list)
+    /**
+    tr().class('table-row').append(
+      td().txt(listing.game_name),
+      td().txt(listing.item_name),
+      td().txt(listing.item_id),
+      td().txt(listing.item_description),
+      td().txt(listing.obtained_on),
+      br()
+    )
+    */
+  )
+  
+  items.map(listing_mapper).map(e => table.append(e))
+
+  if (items.length ==0) {
+    visual_error.innerText = "No Items."
+  } else if (mustache_message.length > 0){
+    visual_error.value = mustache_message
+  }
+</script>
 
 
 </html>
