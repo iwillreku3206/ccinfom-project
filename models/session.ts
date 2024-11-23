@@ -48,6 +48,24 @@ const delete_all_sessions_by_user = `
     WHERE user = ?;
 `
 
+const active_users_query = `
+  SELECT  MONTH(lh.login_on) AS month,
+          COUNT(DISTINCT lh.user) AS count
+  FROM    login_history lh
+  WHERE   YEAR(lh.login_on) = ?
+  GROUP BY  MONTH(lh.login_on)
+  ORDER BY month;
+`
+
+const login_count_query = `
+  SELECT  MONTH(lh.login_on) AS month,
+          COUNT(lh.id) AS count
+  FROM    login_history lh
+  WHERE   YEAR(lh.login_on) = ?
+  GROUP BY  MONTH(lh.login_on)
+  ORDER BY month;
+`
+
 export default class SessionModel extends Model {
   static #instance: SessionModel
 
@@ -71,6 +89,10 @@ export default class SessionModel extends Model {
       .register('expire', expire_session_query, session => [session.id])
     super
       .register('delete-by-user', delete_all_sessions_by_user, session => [session.userId])
+    super
+      .register('active-users', active_users_query, session => [session.year])
+    super
+      .register('login-count', login_count_query, session => [session.year])
   }
 
   public async createSession(userId: number, userAgent: string, retries = 3): Promise<{
@@ -108,6 +130,11 @@ export default class SessionModel extends Model {
   public async deleteUserSessions(userId: string) {
     await super.execute('delete-by-user', { userId })
   }
+
+  public async activeUsers(year: number): Promise<{ month: number, count: number }[]> {
+    return await super.execute('active-users', { year }) as { month: number, count: number }[]
+  }
+  public async loginCount(year: number): Promise<{ month: number, count: number }[]> {
+    return await super.execute('login-count', { year }) as { month: number, count: number }[]
+  }
 }
-
-

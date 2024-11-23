@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Vapor Community Market</title>
+  <link rel="stylesheet" href="/assets/xp.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+
+<body>
+  <main class="center-container">
+    <div class="window" style="width: 300px">
+      <div class="title-bar">
+        <div class="title-bar-text">Market Price Report</div>
+        <div class="title-bar-controls">
+          <button aria-label="Close" onclick="location.href='/admin/reports'"></button>
+        </div>
+      </div>
+      <div class="window-body" style="background: white">
+        Market Price Report for: {{itemName}} from {{gameName}}
+        <br>
+        <fieldset>
+          <legend>Sales</legend>
+          <table>
+            <thead>
+              <tr>
+                <th>Listings Number</th>
+                <th>Sale Price</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#listings}}
+              <tr>
+                <td>{{id}}</td>
+                <td>{{price}}</td>
+                <td>{{date}}</td>
+              </tr>
+              {{/listings}}
+            </tbody>
+          </table>
+        </fieldset>
+        <fieldset>
+          <legend>Statistics</legend>
+          <div>
+            Number of listings: {{len}} <br>
+            Total value: {{total}} <br>
+            Average value: {{average}} <br>
+
+          </div>
+        </fieldset>
+      </div>
+      <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
+    </div>
+  </main>
+</body>
+
+</html>
