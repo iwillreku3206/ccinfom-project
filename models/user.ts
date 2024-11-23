@@ -152,13 +152,13 @@ const getAllUsersByTypeAndUsernameQuery = `
 
 const add_user_balance = `
   UPDATE users
-    balance = balance + ?
+    SET balance = balance + ?
     WHERE id = ?;
 `
 
 const subtract_user_balance = `
   UPDATE users
-    balance = balance - ?
+    SET balance = balance - ?
     WHERE id = ?;
 `
 
