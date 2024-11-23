@@ -116,8 +116,7 @@ const get_user_items_query = `
   JOIN    games g
       ON  g.id = i.game
   WHERE   u.username = ?
-  ORDER BY gameName, name
-  LIMIT   1;
+  ORDER BY gameName, name;
 `
 
 const get_user_listings_query = `
@@ -134,8 +133,8 @@ const get_user_listings_query = `
   JOIN    games g
       ON  g.id = i.game
   WHERE   u.username = ?
-  ORDER BY date DESC
-  LIMIT   1;
+      AND l.sold = 0
+  ORDER BY date DESC;
 `
 
 const getAllUsersByTypeAndUsernameQuery = `
@@ -149,6 +148,7 @@ const getAllUsersByTypeAndUsernameQuery = `
       AND username LIKE ?
   ORDER BY id;
 `
+
 
 export default class UserModel extends Model {
   static #instance: UserModel
