@@ -11,22 +11,27 @@
     <main class="center-container">
         <div class="window" style="width: 300px">
             <div class="title-bar">
-                <div class="title-bar-text">Add Game</div>
+                <div class="title-bar-text">Add Item</div>
                 <div class="title-bar-controls">
                     <button aria-label="Close" onclick="location.href='/home'"></button>
                 </div>
             </div>
             <div class="window-body">
                 <fieldset>
-                    <legend>Specify the game details</legend>
-                    <form method="POST" action="/game/create">
+                    <legend>Specify the item details</legend>
+                    <form method="POST" action="/item/create">
                         <div class="field-row">
-                            <label for="name">Game Name</label>
+                            <label for="name">Item Name</label>
                             <input type="text" id="name" name="name" required />
                         </div>
                         <div class="field-row">
-                            <label for="description">Game Description</label>
+                            <label for="description">Item Description</label>
                             <input type="text" id="description" name="description" required />
+                        </div>
+                        <div class="field-row">
+                            <label for="description">Item Game</label>
+                            <select class="games-select" type="text" id="game" name="game" required />
+                            </select>
                         </div>
                         <div class="field-row form-buttons">
                             <button type="submit">Add</button>
@@ -35,9 +40,9 @@
                 </fieldset>
                 
                 <fieldset>
-                    <legend>Games</legend>
+                    <legend>Items</legend>
                     <table class="table">
-    
+                        
                     </table>
                 </fieldset>
                 </div>
@@ -47,11 +52,14 @@
 		<script>
 
 			// DOM stuff we'll use
-			const games = JSON.parse('{{{gameData}}}');
-			const table = DOM.select('.table')
+			const items = JSON.parse('{{{itemData}}}');
+			const games = JSON.parse('{{{gameData}}}')
+            const table = DOM.select('.table')
+            const select = DOM.select('.games-select')
 
 			// The new elements we'll use
 			const button = () => DOM.element('button')
+			const option = () => DOM.element('option')
 			const tr = () => DOM.element('tr')
 			const td = () => DOM.element('td')
 			const th = () => DOM.element('th')
@@ -60,26 +68,36 @@
 			// Adds the headers of the table
 			table.append(
 				tr().append(
-					th().txt('Game'),
+					th().txt('Item'),
+                    th().txt('Game'),
 					th().txt('Description'),
 					th()
 				)
 			)
 
 			/**
-				* Maps each games to a table row.
-				*/
-			const game_mapper = (game) => (
+            * Maps each games to a table row.
+            */
+			const item_mapper = (item) => (
 				tr().class('table-row').append(
-					td().txt(game.name),
-					td().txt(game.description),
-					td().append(button().stl({ color: 'blue' }).txt('view')).listen('click', () => (location.href = '/game/instance?game=' + game.name)),
-					td().append(button().stl({ color: 'blue' }).txt('delete')).listen('click', () => (location.href = '/game/instance?DELETEGAME')),
+					td().txt(item.name),
+					td().txt(item.game),
+					td().txt(item.description),
+					td().append(button().stl({ color: 'blue' }).txt('view')).listen('click', () => (location.href = '/items/item?item=' + item.name)),
+					td().append(button().stl({ color: 'blue' }).txt('delete')).listen('click', () => (location.href = '/items/item?DELETEGAME')),
 					br()
 				)
 			)
+            
+            /**
+            * Maps each game to an option tag
+            */
+            const game_mapper = (game) => (
+                option().txt(game.name).attribs({ value: game.id })
+            )
 
-			games.map(game_mapper).map(e => table.append(e))
+			items.map(item_mapper).map(e => table.append(e))
+            games.map(game_mapper).map(e => select.append(e))
 		</script>
     </main>
 </body> 

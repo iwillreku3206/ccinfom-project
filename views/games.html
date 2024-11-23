@@ -61,8 +61,8 @@
 			// Adds the headers of the table
 			table.append(
 				tr().append(
-					th().text('Game'),
-					th().text('Description'),
+					th().txt('Game'),
+					th().txt('Description'),
 					th()
 				)
 			)
@@ -72,9 +72,9 @@
 				*/
 			const game_mapper = (game) => (
 				tr().class('table-row').append(
-					td().text(game.name),
-					td().text(game.description),
-					td().append(button().stl({ color: 'blue' }).text('view')).listen('click', () => (location.href = '/game/instance?game=' + game.name)),
+					td().txt(game.name),
+					td().txt(game.description),
+					td().append(button().stl({ color: 'blue' }).txt('view')).listen('click', () => (location.href = '/game/instance?game=' + game.name)),
 					br()
 				)
 			)

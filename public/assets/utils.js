@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-22 14:42:30
- * @ Modified time: 2024-11-22 15:13:55
+ * @ Modified time: 2024-11-23 14:43:16
  * @ Description:
  * 
  * A bunch of front-end utils just to make our lives easier.
@@ -20,7 +20,7 @@ const DOM = (() => {
 			(children.map(child => element.appendChild(child)), element),
 
 		// Sets the text content of the element
-		text: (text) => (
+		txt: (text) => (
 			text !== undefined
 				? (element.textContent = text, element)
 				: (element.outerHTML) 
