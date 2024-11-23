@@ -1,4 +1,5 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
+import bodyParser from 'body-parser'
 import log from 'log'
 import { authRouter } from '../controllers/auth/authController'
 import { rootRouter } from '../controllers/rootController'
@@ -16,6 +17,12 @@ function logger(req: Request, _res: Response, next: NextFunction) {
   log.info(`${req.method}: ${req.path}`)
   next()
 }
+
+app.use(express.json());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+
 
 app.use(logger)
 app.use(express.urlencoded({}))

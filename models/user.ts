@@ -40,6 +40,7 @@ export interface IUserProfileInventoryItem {
 
 // Specs
 type create_user_spec = Omit<IUser, 'id' | 'balance'>
+type update_balance_spec = Pick<IUser, 'id' | 'balance'>
 type get_user_by_username_spec = Pick<IUser, 'username'>
 type get_user_by_session_spec = { sessionId: string }
 type update_user_profile_by_session_spec = Pick<IUser, 'username' | 'displayName'> & { sessionId: string }
@@ -149,6 +150,12 @@ const getAllUsersByTypeAndUsernameQuery = `
   ORDER BY id;
 `
 
+const update_user_balance = `
+  UPDATE users
+    balance = balance - ?
+    WHERE id = ?;
+`
+
 const deleteUserQuery = `
 DELETE FROM \`users\`
   WHERE id = ?;
@@ -196,6 +203,8 @@ export default class UserModel extends Model {
       .register('delete-user', deleteUserQuery, user => [user.userId])
     super
       .register('user-count', userCountQuery, () => [])
+    super
+      .register('update-balance', update_user_balance, user => [user.id, user.balance])
   }
 
   public async createUser(user: create_user_spec) {
@@ -259,6 +268,10 @@ export default class UserModel extends Model {
     const users = await super.execute('get-users-by-type-username', { userType: ut, userName: u });
 
     return users as Omit<IUser, "passwordHash">[]
+  }
+  
+  public async updateBalance(user: update_balance_spec) {
+    await this.execute('update-balance', user)
   }
 
   public async deleteUser(userId: number) {

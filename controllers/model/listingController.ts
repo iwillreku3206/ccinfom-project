@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-16 11:34:48
- * @ Modified time: 2024-11-23 11:44:55
+ * @ Modified time: 2024-11-23 19:45:30
  * @ Description:
  * 
  * A controller for the listings-related pages and functionality.
@@ -11,6 +11,8 @@ import express from 'express'
 import { render } from '../../util/io'
 import { errorHandler, isLoggedIn, modelHandler } from '../../util/plugins'
 import ListingModel from '../../models/listing';
+import UserModel from '../../models/user';
+import ItemModel from '../../models/item';
 
 // The router to use
 export const listingRouter = express.Router()
@@ -81,4 +83,15 @@ listingRouter.post('/post', async (req, res) => {
   model.createListing({ item: 1, price: Math.random() * 1000, seller: user.id })
     .then(() => res.redirect('/home'))
     .catch((error: Error) => res.status(500).redirect('/listing/create?error=' + error))
+})
+
+listingRouter.post('/buy', async(req, res) => {
+  const { user, model, error } = res.locals;
+  const { listing_id } = req.body;
+
+  // Buy listing
+  ListingModel.instance.buyListing({ id: listing_id, buyer_id: user.id })
+
+  // Succssful transaction
+  res.send({ success: true })
 })
