@@ -17,4 +17,4 @@ adminRouter.get('/', async (req, res) => {
   })
 })
 adminRouter.use('/users', adminUserRouter)
-adminRouter.use('/reprots', reportsRouter)
+adminRouter.use('/reports', reportsRouter)
