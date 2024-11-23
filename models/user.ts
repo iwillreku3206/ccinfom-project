@@ -161,6 +161,10 @@ DELETE FROM \`users\`
   WHERE id = ?;
 `
 
+const userCountQuery = `
+  SELECT  COUNT(id) AS count
+  FROM    users;
+`
 
 export default class UserModel extends Model {
   static #instance: UserModel
@@ -197,6 +201,8 @@ export default class UserModel extends Model {
       .register('get-users-by-type-username', getAllUsersByTypeAndUsernameQuery, user => [user.userType, user.userName])
     super
       .register('delete-user', deleteUserQuery, user => [user.userId])
+    super
+      .register('user-count', userCountQuery, () => [])
     super
       .register('update-balance', update_user_balance, user => [user.id, user.balance])
   }
@@ -269,6 +275,9 @@ export default class UserModel extends Model {
   }
 
   public async deleteUser(userId: number) {
-    await super.execute('delete-user', {userId})
+    await super.execute('delete-user', { userId })
+  }
+  public async userCount(): Promise<number> {
+    return ((await super.execute('user-count', {})) as { count: number }[])[0].count as number
   }
 }
