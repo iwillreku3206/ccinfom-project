@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-22 14:42:30
- * @ Modified time: 2024-11-23 14:43:16
+ * @ Modified time: 2024-11-23 19:37:51
  * @ Description:
  * 
  * A bunch of front-end utils just to make our lives easier.
@@ -81,6 +81,20 @@ const DOM = (() => {
 				? fluent(selection[0])
 				: Array.from(selection).map(s => fluent(s)) 
 		))(document.querySelectorAll(selector)) 
+	)
+
+	/**
+	 * Create a post request to the target with the given body.
+	 * 
+	 * @param target	The target of the post request.
+	 * @returns				A promise containing the result of the request. 
+	 */
+	_.post = (target, content) => (
+		fetch(target, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' }, 
+			body: JSON.stringify(content)
+		})
 	)
 
 	return {
