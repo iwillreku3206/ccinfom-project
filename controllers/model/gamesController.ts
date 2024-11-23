@@ -48,7 +48,7 @@ gameRouter.post('/', async (req: Request, res: Response) => {
   })
 })
 
-gameRouter.get('/add', async (req: Request, res: Response) => {
+gameRouter.get('/manage', async (req: Request, res: Response) => {
   const { user, model, error } = res.locals;
 
   if (user?.userType == 'basic')
@@ -61,13 +61,13 @@ gameRouter.get('/add', async (req: Request, res: Response) => {
   })
 })
 
-gameRouter.post('/add', async (req: Request, res: Response) => {
+gameRouter.post('/manage', async (req: Request, res: Response) => {
   const { user, model, error } = res.locals;
   
   try {
     await model.createGame({ name: req.body.name, description: req.body.description })
   } catch (error) {
-    res.redirect("/games/add?error=" + error)
+    res.redirect("/games/manage?error=" + error)
   }
-  res.redirect("/games")
+  res.redirect("/games/manage")
 })
