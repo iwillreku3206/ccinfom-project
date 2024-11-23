@@ -85,13 +85,37 @@ listingRouter.post('/post', async (req, res) => {
     .catch((error: Error) => res.status(500).redirect('/listing/create?error=' + error))
 })
 
-listingRouter.post('/buy', async(req, res) => {
+listingRouter.get(`/buy`, async (req, res) => {
   const { user, model, error } = res.locals;
-  const { listing_id } = req.body;
+  
+  render(res, "buyListings", { error })
+})
 
-  // Buy listing
-  ListingModel.instance.buyListing({ id: listing_id, buyer_id: user.id })
+listingRouter.post(`/buy/getListings`, async (req, res) => {
+  const { user, model, error } = res.locals;
 
-  // Succssful transaction
-  res.send({ success: true })
+  let { item, seller, pricemin, pricemax, datemin, datemax } = req.body;
+
+  // Set the bounds if at least one defined
+  if (pricemin?.length || pricemax?.length) {
+    pricemin = pricemin?.length ? pricemin : '0'
+    pricemax = pricemax?.length ? pricemax : (1e20).toString()
+  }
+
+  // Set the bounds if at least one defined
+  if(datemin?.length || datemax?.length) {
+    datemin = datemin?.length ? datemin : '0'
+    datemax = datemax?.length ? datemax : (1e20).toString()
+  }
+
+  // Grab listings then render
+  const listings = await (() => (
+      item?.length        ? model.getFilteredListings('item', parseInt(item))
+    : seller?.length      ? model.getFilteredListings('seller', parseInt(seller))
+    : pricemin?.length    ? model.getFilteredListings('price', parseFloat(pricemin), parseFloat(pricemax)) 
+    : datemin?.length     ? model.getFilteredListings('list_date', parseInt(datemin), parseInt(datemax))
+    : model.getAllListings()
+  ))()
+  const listingData = JSON.stringify(listings)
+  render(res, "buyListings", { listingData, error })
 })

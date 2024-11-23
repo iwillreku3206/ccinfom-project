@@ -10,6 +10,7 @@ import { listingRouter } from '../controllers/model/listingController'
 import { userInvItemsRouter } from '../controllers/model/uiiController'
 import { adminRouter } from '../controllers/admin/adminController'
 import { itemRouter } from '../controllers/model/itemController'
+import { buyingRouter } from '../controllers/model/buyingController'
 
 export const app = express()
 
@@ -36,4 +37,4 @@ app.use("/profile", profileRouter)
 app.use("/game", gameRouter)
 app.use("/listing", listingRouter)
 app.use("/item", itemRouter)
-app.use("/userinventoryitems", userInvItemsRouter)
+app.use("/userInventoryItems", userInvItemsRouter)

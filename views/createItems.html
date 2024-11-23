@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Vapor Community Market</title>
+  <link rel="stylesheet" href="/assets/xp.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+
+<body>
+  <main class="center-container">
+
+    <div class="window" style="width: 500px">
+      <div class="title-bar">
+        
+        <div class="title-bar-text">Search inventory items</div>
+
+        <div class="title-bar-controls">
+          <button aria-label="Close" onclick="location.href='/'"></button>
+        </div>
+        
+      </div>
+      <div class="window-body">
+        <p>Inspect someone's inventory.</p>
+        <form action="/userInventoryItems/inspect" method="post">
+          <p>Enter details to inspect:</p>
+          <div class="field-row">
+            <label for="username">Username</label>
+            <input id="username" type="text" name="username" required />
+          </div>
+
+          <section class="field-row" style="justify-content: flex-end">
+            <button type="reset">Reset</button>
+            <button type="submit">Submit</button>
+          </section>
+        </form>
+        <p>Items: </p>
+        <p style="color: red" id="mesError"></p>
+        <table class="table">
+	
+        </table>
+      </div>
+      <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
+    </div>
+    <script src="/assets/utils.js"></script>  
+		<script type="module">
+      const passed_message = `{{{error}}}`
+      const passed_items    = `{{{items}}}`
+      const visual_error = DOM.select(`#mesError`)
+      const items = JSON.parse(passed_items)
+      if (passed_items.length == 0) 
+        visual_error.value = "No Items."
+      else if (passed_message.length > 0)
+        visual_error.value = passed_message
+
+      const table = DOM.select('.table')
+
+      // The new elements we'll use
+      const button = () => DOM.element('button')
+      const tr = () => DOM.element('tr')
+      const td = () => DOM.element('td')
+      const th = () => DOM.element('th')
+      const br = () => DOM.element('br')
+  
+      // Adds the headers of the table
+      table.append(
+        tr().append(
+          th().txt('Game Name'),
+          th().txt('Item Name'),
+          th().txt('Item ID'),
+          th().txt('Item Description'),
+          th().txt('Obtained On'),
+        )
+      )
+  
+      /**
+        * Maps each listing to a table row.
+        */
+      const item_mapper = (item) => (
+        
+        tr().class('table-row').append(
+          td().txt(item.game_name),
+          td().txt(item.item_name),
+          td().txt(item.item_id),
+          td().txt(item.item_description),
+          td().txt(item.obtained_on),
+          br()
+        )
+      )
+      
+      items.map(item_mapper).map(e => table.append(e))
+    </script>
+  </main>
+</body>
+
+
+</html>
