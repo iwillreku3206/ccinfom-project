@@ -60,6 +60,11 @@ reportsRouter.get('/marketPriceReport', async (req, res) => {
   })
 })
 
+reportsRouter.get('/itemsListed', async (req, res) => {
+  const { user } = res.locals;
+  const items = await ItemModel.instance.getAllItemsWithGameName()
+  render(res, "reports/itemsListedReportOptions", {
+})
 reportsRouter.get('/activeCount', async (req, res) => {
   const { user } = res.locals;
   const items = await ItemModel.instance.getAllItemsWithGameName()
@@ -68,6 +73,28 @@ reportsRouter.get('/activeCount', async (req, res) => {
     displayName: user?.displayName || user?.username,
     items,
     error: req.query.error || ''
+  })
+})
+  
+reportsRouter.get('/itemsListedReport', async (req, res) => {
+  const { user } = res.locals;
+
+  if (req.query.year == "")
+    res.redirect("/itemsListed?error=Invalid year")
+
+  const itemDetails = await ItemModel.instance.getItemWithGameNameById(parseInt(String(req.query.item)))
+
+  if (!itemDetails) return res.redirect("/itemsListed?error=Invalid item")
+
+  const listings = await ItemModel.instance.itemsListedReport(parseInt(String(req.query.item)), parseInt(String(req.query.year)))
+
+  render(res, "reports/itemsListedReport", {
+    username: user?.username,
+    displayName: user?.displayName || user?.username,
+    listings,
+    len: listings.length,
+    itemName: itemDetails.name,
+    gameName: itemDetails.game
   })
 })
 

@@ -50,6 +50,25 @@ const delete_game_query = `
     WHERE       id = ?; 
 `
 
+const game_sales_report = `
+    SELECT      g.id as gameID,
+                g.name as gameName,
+                MONTHNAME(sl.buy_date) as month,
+                SUM(l.price) as totalSales
+    FROM        games g
+    LEFT JOIN   items i
+        ON      i.game = g.id
+    LEFT JOIN   listings l
+        ON      l.item = i.id
+        AND     l.sold = 1
+    LEFT JOIN   sold_listings sl
+        ON      sl.listing = l.id
+    WHERE       g.id = ?
+        AND     YEAR(sl.buy_date) = ?
+    GROUP BY    g.id, month
+    ORDER BY    totalSales DESC;
+`
+
 export class GameModel extends Model {
     static #instance: GameModel
 
@@ -67,6 +86,7 @@ export class GameModel extends Model {
         super.register('get-all', get_all_games_query, _ => [])
         super.register('get-by-name', get_game_by_name_query, game => [ game.name ])
         super.register('delete', delete_game_query, game => [ game.id ])
+        super.register('salesreport', game_sales_report, l => [l.gameId, l.year])
     }
 
     /**
@@ -120,5 +140,9 @@ export class GameModel extends Model {
 
     public async deleteGame(game: delete_game_spec) {
         await this.execute('delete', {})
+    }
+
+    public async gameSalesReport(gameId: number, year: number): Promise<{gameId: number, gameName: string, monthName: string, totalSales: number}[]> {
+        return await this.execute('salesreport', { gameId, year }) as {gameId: number, gameName: string, monthName: string, totalSales: number}[]
     }
 }
