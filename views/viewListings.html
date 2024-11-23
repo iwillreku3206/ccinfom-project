@@ -118,14 +118,15 @@
 				td().txt(listing.seller),
 				td().append(button().stl({ color: 'blue' }).txt('buy'))
 					.listen('click', () => 
-						DOM.post('/listing/buy', { listing_id: listing })
-							.then(() => location.href = './userinventoryitems/' + username)),
-				td().append(button().stl({ color: 'red' }).txt('delete')),
+						DOM.post('/listing/buy', { listing_id: listing.id })
+							.then(() => (alert('Successfully bought item'), location.reload()) )),
 				br()
 			)
 		)
 
-		listings.map(listing_mapper).map(e => table.append(e))
+		listings
+			.filter(listing => !listing.sold)
+			.map(listing_mapper).map(e => table.append(e))
 	</script>
 </body>
 

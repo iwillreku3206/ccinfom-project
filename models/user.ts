@@ -1,9 +1,9 @@
 import argon2 from "argon2"
 import { type RowDataPacket } from "mysql2"
 import Model, { type SQLValueList } from "./model"
-import log from "log"
 import type { IListing } from "./listing"
 import type { UserInventoryItems } from "./userInventoryItems"
+import log from "log"
 
 export interface IUser {
   id: number,
@@ -150,9 +150,15 @@ const getAllUsersByTypeAndUsernameQuery = `
   ORDER BY id;
 `
 
-const update_user_balance = `
+const add_user_balance = `
   UPDATE users
-    balance = balance - ?
+    SET balance = balance + ?
+    WHERE id = ?;
+`
+
+const subtract_user_balance = `
+  UPDATE users
+    SET balance = balance - ?
     WHERE id = ?;
 `
 
@@ -161,6 +167,10 @@ DELETE FROM \`users\`
   WHERE id = ?;
 `
 
+const userCountQuery = `
+  SELECT  COUNT(id) AS count
+  FROM    users;
+`
 
 export default class UserModel extends Model {
   static #instance: UserModel
@@ -198,7 +208,11 @@ export default class UserModel extends Model {
     super
       .register('delete-user', deleteUserQuery, user => [user.userId])
     super
-      .register('update-balance', update_user_balance, user => [user.id, user.balance])
+      .register('subtract-balance', subtract_user_balance, user => [user.balance, user.id])
+    super
+      .register('add-balance', add_user_balance, user => [user.balance, user.id])
+    super
+      .register('user-count', userCountQuery, () => [])
   }
 
   public async createUser(user: create_user_spec) {
@@ -264,11 +278,18 @@ export default class UserModel extends Model {
     return users as Omit<IUser, "passwordHash">[]
   }
   
-  public async updateBalance(user: update_balance_spec) {
-    await this.execute('update-balance', user)
+  public async subtractBalance(user: update_balance_spec) {
+    await this.execute('subtract-balance', user)
+  }
+  
+  public async addBalance(user: update_balance_spec) {
+    await this.execute('add-balance', user)
   }
 
   public async deleteUser(userId: number) {
-    await super.execute('delete-user', {userId})
+    await super.execute('delete-user', { userId })
+  }
+  public async userCount(): Promise<number> {
+    return ((await super.execute('user-count', {})) as { count: number }[])[0].count as number
   }
 }

@@ -1,0 +1,34 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Vapor Community Market</title>
+  <link rel="stylesheet" href="/assets/xp.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+
+<body>
+  <main class="center-container">
+    <div class="window" style="width: 300px">
+      <div class="title-bar">
+        <div class="title-bar-text">Active User Count Report</div>
+        <div class="title-bar-controls">
+          <button aria-label="Close" onclick="location.href='/home'"></button>
+        </div>
+      </div>
+      <fieldset>
+        <div style="color:red;">{{error}}</div>
+        <legend>Settings</legend>
+        <form action="/admin/reports/userItemsReport" method="get">
+          <label for="year">Year:</label>
+          <input type="number" name="year" id="year">
+          <button type="submit">Generate</button>
+        </form>
+      </fieldset>
+      <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
+    </div>
+  </main>
+</body>
+
+</html>

@@ -11,59 +11,63 @@
   <main class="center-container">
     <div class="window" style="width: 300px">
       <div class="title-bar">
-        <div class="title-bar-text">Active User Count Report</div>
+        <div class="title-bar-text">Market Price Report</div>
         <div class="title-bar-controls">
           <button aria-label="Close" onclick="location.href='/admin/reports'"></button>
         </div>
       </div>
       <div class="window-body" style="background: white">
-        User login and activity report for: {{year}}
+        Items report for {{year}}
         <br>
         <fieldset>
-          <legend>Logins per month</legend>
+          <legend>Added</legend>
           <table>
             <thead>
               <tr>
-                <th>Month</th>
-                <th>Login Count</th>
+                <th>Game</th>
+                <th>Item</th>
+                <th>Count</th>
               </tr>
             </thead>
             <tbody>
-              {{#loginCount}}
+              {{#addedItems}}
               <tr>
-                <td>{{month}}</td>
+                <td>{{gameName}}</td>
+                <td>{{itemName}}</td>
                 <td>{{count}}</td>
               </tr>
-              {{/loginCount}}
+              {{/addedItems}}
             </tbody>
           </table>
         </fieldset>
         <fieldset>
-          <legend>Active users per month</legend>
+          <legend>Removed</legend>
           <table>
             <thead>
               <tr>
-                <th>Month</th>
-                <th>Active User Count</th>
+                <th>Game</th>
+                <th>Item</th>
+                <th>Count</th>
               </tr>
             </thead>
             <tbody>
-              {{#activeUserCount}}
+              {{#removedItems}}
               <tr>
-                <td>{{month}}</td>
+                <td>{{gameName}}</td>
+                <td>{{itemName}}</td>
                 <td>{{count}}</td>
               </tr>
-              {{/activeUserCount}}
+              {{/removedItems}}
             </tbody>
           </table>
         </fieldset>
         <fieldset>
           <legend>Statistics</legend>
           <div>
-            Number of users: {{ userCount }} <br>
-            Average monthly active user count: {{ averageActiveUsers }} <br>
-            Average monthly login count: {{ averageLoginCount }} <br>
-            Average active user rate: {{ activeUserRate }} %
+            Total Items: {{count}} <br>
+            Total Added: {{addedSum}} <br>
+            Total removed: {{removedSum}} <br>
+
           </div>
         </fieldset>
       </div>
