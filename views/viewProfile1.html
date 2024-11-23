@@ -19,12 +19,21 @@
       <div class="title-bar">
         <div class="title-bar-text">View a profile</div>
         <div class="title-bar-controls">
-          <button aria-label="Close" onclick="location.href='/profile'"></button>
+          <button aria-label="Close" onclick="location.href='/home'"></button>
         </div>
       </div>
       <div class="window-body">
         <p>Enter the user's name</p>
         <p style="color: red">{{error}}</p>
+        <form method="GET" action="/profile">
+          <div class="field-row">
+            <label for="username">Username</label>
+            <input id="username" type="text" name="username" required />
+          </div>
+          <section class="field-row" style="justify-content: flex-end">
+            <button type="submit">Find</button>
+          </section>
+        </form>
       </div>
     </div>
   </main>
