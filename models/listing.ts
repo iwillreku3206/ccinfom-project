@@ -71,6 +71,20 @@ const market_price_report = `
   WHERE  YEAR(l.list_date) = ?
       AND i.id = ?;
 `
+
+const item_sales_report = `
+    SELECT      sl.buy_date as date,
+                COUNT(sl.id) as totalSales
+    FROM        listings l
+    LEFT JOIN   sold_listings sl
+        ON      sl.listing = l.id
+    WHERE       l.sold = 1
+        AND     MONTH(buy_date) = ?
+        AND     YEAR(buy_date) = ?
+    GROUP BY    date
+    ORDER BY    date;
+`
+
 // The model to use
 export default class ListingModel extends Model {
   static #instance: ListingModel
@@ -100,6 +114,7 @@ export default class ListingModel extends Model {
     super.register('update-sold', update_sold_listing_by_id_query, sold => [sold.id])
     super.register('delete-listings-by-userid', delete_listings_by_userid, l => [l.userId])
     super.register('marketpricereport', market_price_report, l => [l.year, l.itemId])
+    super.register('salesreport', item_sales_report, l => [l.month, l.year])
   }
 
   /**
@@ -175,6 +190,10 @@ export default class ListingModel extends Model {
 
   async marketPriceReport(year: number, itemId: number): Promise<{ itemName: string, gameName: string, price: number, id: number }[]> {
     return await this.execute('marketpricereport', { year, itemId }) as { itemName: string, gameName: string, price: number, id: number }[]
+  }
+
+  async itemSalesReport(month: number, year:number): Promise<{ date: string, totalSales: number }[]> {
+    return await this.execute('salesreport', { month, year }) as { date: string, totalSales: number }[]
   }
 }
 
