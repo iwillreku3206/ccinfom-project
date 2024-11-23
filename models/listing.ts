@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-16 10:43:56
- * @ Modified time: 2024-11-23 19:48:01
+ * @ Modified time: 2024-11-23 20:08:24
  * @ Description:
  * 
  * Manages mapping listings to runtime objects.
@@ -157,13 +157,16 @@ export default class ListingModel extends Model {
     if(!sold) return;
 
     // Create sold entry
-    await this.execute('create-sold', { listing: sold?.id, buyer: listing.buyer_id  })  
+    await this.execute('create-sold', { listing: sold?.id, buyer: listing.buyer_id  })
     
     // Mark as sold
     await this.execute('update-sold', { id: listing.id })
 
     // Subtracts the price of the item from the balance of the user
-    await UserModel.instance.updateBalance({ id: listing.buyer_id, balance: sold.price })
+    await UserModel.instance.subtractBalance({ id: listing.buyer_id, balance: sold.price })
+
+    // Adds the price of the item from the balance of the user
+    await UserModel.instance.addBalance({ id: listing.buyer_id, balance: sold.price })
   }
 
   /**
