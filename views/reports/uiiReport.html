@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Vapor Community Market</title>
+  <link rel="stylesheet" href="/assets/xp.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+
+<body>
+  <main class="center-container">
+    <div class="window" style="width: 300px">
+      <div class="title-bar">
+        <div class="title-bar-text">Market Price Report</div>
+        <div class="title-bar-controls">
+          <button aria-label="Close" onclick="location.href='/admin/reports'"></button>
+        </div>
+      </div>
+      <div class="window-body" style="background: white">
+        Items report for {{year}}
+        <br>
+        <fieldset>
+          <legend>Added</legend>
+          <table>
+            <thead>
+              <tr>
+                <th>Game</th>
+                <th>Item</th>
+                <th>Count</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#addedItems}}
+              <tr>
+                <td>{{gameName}}</td>
+                <td>{{itemName}}</td>
+                <td>{{count}}</td>
+              </tr>
+              {{/addedItems}}
+            </tbody>
+          </table>
+        </fieldset>
+        <fieldset>
+          <legend>Removed</legend>
+          <table>
+            <thead>
+              <tr>
+                <th>Game</th>
+                <th>Item</th>
+                <th>Count</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#removedItems}}
+              <tr>
+                <td>{{gameName}}</td>
+                <td>{{itemName}}</td>
+                <td>{{count}}</td>
+              </tr>
+              {{/removedItems}}
+            </tbody>
+          </table>
+        </fieldset>
+        <fieldset>
+          <legend>Statistics</legend>
+          <div>
+            Total Items: {{count}} <br>
+            Total Added: {{addedSum}} <br>
+            Total removed: {{removedSum}} <br>
+
+          </div>
+        </fieldset>
+      </div>
+      <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
+    </div>
+  </main>
+</body>
+
+</html>
