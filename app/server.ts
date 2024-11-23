@@ -7,7 +7,7 @@ import { profileRouter } from '../controllers/model/profileController'
 import { gameRouter } from '../controllers/model/gamesController'
 import { listingRouter } from '../controllers/model/listingController'
 import { userInvItemsRouter } from '../controllers/model/uiiController'
-import { adminRouter } from '../controllers/auth/adminController'
+import { adminRouter } from '../controllers/admin/adminController'
 
 export const app = express()
 

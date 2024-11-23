@@ -11,6 +11,11 @@
   <title>Vapor Community Market</title>
   <link rel="stylesheet" href="/assets/xp.css">
   <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    table,tr,td,th {
+      border-collapse: collapse;
+    }
+  </style>
 </head>
 
 <body>
@@ -19,21 +24,72 @@
       <div class="title-bar">
         <div class="title-bar-text">View a profile</div>
         <div class="title-bar-controls">
-          <button aria-label="Close" onclick="location.href='/home'"></button>
+          <button aria-label="Close" onclick="location.href='/profile'"></button>
         </div>
       </div>
       <div class="window-body">
-        <p>Enter the user's name</p>
-        <p style="color: red">{{error}}</p>
-        <form method="GET" action="/profile">
+        <div style="background:white;padding:0.5em;">
           <div class="field-row">
-            <label for="username">Username</label>
-            <input id="username" type="text" name="username" required />
+            Username: {{profile.username}} (id {{profile.id}})
           </div>
-          <section class="field-row" style="justify-content: flex-end">
-            <button type="submit">Find</button>
-          </section>
-        </form>
+          <div class="field-row">
+            Display Name: {{profile.displayName}}
+          </div>
+          <div class="field-row">
+            User Type: {{profile.userType}}
+          </div>
+          {{#ownProfile}}
+            <div class="field-row">
+              Balance: {{ profile.balance }}
+            </div>
+          {{/ownProfile}}
+        </div>
+        <fieldset>
+          <legend>Inventory</legend>
+          <table border>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Game</th>
+                <th>Obtained On</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#profile.inventory}}
+                <tr>
+                  <td>{{name}}</td>
+                  <td>{{gameName}}</td>
+                  <td>{{obtainedOn}}</td>
+                </tr>
+              {{/profile.inventory}}
+            </tbody>
+          </table>
+        </fieldset>
+        <fieldset>
+          <legend>Listings</legend>
+          <table border>
+            <thead>
+              <tr>
+                <th>Game</th>
+                <th>Item</th>
+                <th>Price</th>
+                <th>List Date</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#profile.listings}}
+                <tr>
+                  <td>{{name}}</td>
+                  <td>{{gameName}}</td>
+                  <td>{{price}}</td>
+                  <td>{{date}}</td>
+                  <!--TODO: buy button-->
+                </tr>
+              {{/profile.listings}}
+            </tbody>
+          </table>
+        </fieldset>
       </div>
     </div>
   </main>

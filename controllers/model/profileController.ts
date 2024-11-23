@@ -23,10 +23,10 @@ profileRouter.post('/update', async (req: Request, res: Response) => {
   const { user, model, error } = res.locals;
 
   try {
-    await model.updateProfileBySession({ 
-      sessionId: req.cookies.session, 
-      username: req.body.username, 
-      displayName: req.body.displayName 
+    await model.updateProfileBySession({
+      sessionId: req.cookies.session,
+      username: req.body.username,
+      displayName: req.body.displayName
     })
   } catch (error) {
     return res.redirect("/profile/update?error=" + error)
@@ -35,11 +35,24 @@ profileRouter.post('/update', async (req: Request, res: Response) => {
 })
 
 profileRouter.get("/", async (req, res) => {
-  const { user, model, error } = res.locals;
+  let { user, error } = res.locals;
+  const username = String(req.query.username || '')
+  const profile = await UserModel.instance.getUserProfile(String(username || ''))
 
-  render(res, "viewProfile1", {
-    username: user?.username,
-    displayName: user?.displayName,
-    error
-  })
+  if (username != '' && profile == null) error = "User not found"
+
+  if (!profile) {
+    render(res, "viewProfile1", {
+      username: user?.username,
+      displayName: user?.displayName,
+      error
+    })
+  } else {
+    console.log(profile)
+    render(res, "viewProfile2", {
+      profile,
+      ownProfile: profile.id === res.locals.user.id,
+      error
+    })
+  }
 })

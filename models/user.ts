@@ -92,7 +92,8 @@ const update_user_password_by_session_query = `
 `
 
 const get_user_basic_info_query = `
-  SELECT  u.username AS username,
+  SELECT  u.id AS id,
+          u.username AS username,
           u.display_name AS displayName,
           u.balance AS balance,
           u.user_type AS userType
@@ -106,13 +107,13 @@ const get_user_items_query = `
           g.name AS gameName,
           ui.obtained_on AS obtainedOn
   FROM    users u
-  WHERE   u.username = ?
   JOIN    inventory_items ui
       ON  u.id = ui.user
   JOIN    items i
       ON  i.id = ui.item
   JOIN    games g
       ON  g.id = i.game
+  WHERE   u.username = ?
   ORDER BY gameName, name
   LIMIT   1;
 `
@@ -124,13 +125,13 @@ const get_user_listings_query = `
           l.price AS price,
           l.list_date AS date
   FROM    users u
-  WHERE   u.username = ?
   JOIN    listings l
       ON  l.seller = u.id
   JOIN    items i
       ON  l.item = i.id
   JOIN    games g
-      ON  g.id = l.game
+      ON  g.id = i.game
+  WHERE   u.username = ?
   ORDER BY date DESC
   LIMIT   1;
 `
@@ -209,33 +210,17 @@ export default class UserModel extends Model {
   }
 
   public async getUserProfile(username: string): Promise<IUserProfile | null> {
-    const basicInfo = await super.execute<RowDataPacket[]>('get-basic-info', { username })
+    const basicInfo = await super.execute<RowDataPacket[]>('get-basic-info', { username }) as Omit<IUserProfile, 'passwordHash'>[]
     if (basicInfo.length == 0) return null
 
-    const items = await super.execute<RowDataPacket[]>('get-items', { username })
+    const items = await super.execute<RowDataPacket[]>('get-items', { username }) as IUserProfileInventoryItem[]
 
-    const itemList: IUserProfileInventoryItem[] = items.map(i => ({
-      name: i[0],
-      gameName: i[1],
-      obtainedOn: i[2]
-    }))
-
-    const listings = await super.execute<RowDataPacket[]>('get-listings', { username })
-    const listingList: IUserProfileListing[] = listings.map(i => ({
-      id: i[0],
-      name: i[1],
-      gameName: i[2],
-      price: i[3],
-      date: i[4],
-    }))
+    const listings = await super.execute<RowDataPacket[]>('get-listings', { username }) as IUserProfileListing[]
 
     return {
-      username: basicInfo[0][0],
-      displayName: basicInfo[0][1],
-      balance: basicInfo[0][2],
-      userType: basicInfo[0][3],
-      listings: listingList,
-      inventory: itemList
+      ...basicInfo[0],
+      inventory: items,
+      listings
     }
   }
 }
