@@ -21,6 +21,12 @@
 					<fieldset>
 						<legend>{{game}}</legend>
 						<p>{{description}}</p>
+						
+						{{#admin}}
+						<div class="field-row form-buttons">
+							<button class="delete-button">delete</button>
+						</div>
+						{{/admin}}
 					</fieldset>
 					
 					<fieldset>
@@ -37,8 +43,9 @@
 		<script>
 
 			// DOM stuff we'll use
-			const items = JSON.parse(`{{{itemData}}}`);
+			const items = JSON.parse(`{{{itemData}}}`) ?? [];
 			const table = DOM.select('.table')
+			const delete_button = DOM.select('.delete-button')
 
 			// The new elements we'll use
 			const button = () => DOM.element('button')
@@ -68,7 +75,12 @@
 				)
 			)
 
+			items.length && delete_button && delete_button
+				.attribs({ disabled: true })
+				.listen('mousemove', () => DOM.tooltip('You cannot delete games with items.'))
+				.listen('mouseout', () => DOM.tooltip())
 			items.map(item_mapper).map(e => table.append(e))
+			delete_button.listen('click', () => DOM.post('/game/delete', { id: '{{id}}' }))
 		</script>
 	</body> 
 

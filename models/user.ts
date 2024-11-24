@@ -43,6 +43,7 @@ type create_user_spec = Omit<IUser, 'id' | 'balance'>
 type update_balance_spec = Pick<IUser, 'id' | 'balance'>
 type get_user_by_username_spec = Pick<IUser, 'username'>
 type get_user_by_session_spec = { sessionId: string }
+type inventory_sell_spec = { inventory_id: number, user_id: number }
 type update_user_profile_by_session_spec = Pick<IUser, 'username' | 'displayName'> & { sessionId: string }
 type update_user_password_by_session_spec = Pick<IUser, 'passwordHash'> & { sessionId: string }
 type get_all_users_by_type_and_username_spec = Partial<Pick<IUser, "username"> & Pick<IUser, "userType">>
@@ -187,32 +188,19 @@ export default class UserModel extends Model {
   private constructor() {
     super()
 
-    super
-      .register('create', create_user_query, user => [user.username, user.displayName, user.userType, user.passwordHash])
-    super
-      .register('get-by-username', get_user_by_username_query, user => [user.username])
-    super
-      .register('get-by-session', get_user_by_session_query, user => [user.sessionId])
-    super
-      .register('update-profile-by-session', update_user_profile_by_session_query, user => [user.sessionId, user.username, user.displayName])
-    super
-      .register('update-password-by-session', update_user_password_by_session_query, user => [user.sessionId, user.passwordHash])
-    super
-      .register('get-basic-info', get_user_basic_info_query, user => [user.username])
-    super
-      .register('get-listings', get_user_listings_query, user => [user.username])
-    super
-      .register('get-items', get_user_items_query, user => [user.username])
-    super
-      .register('get-users-by-type-username', getAllUsersByTypeAndUsernameQuery, user => [user.userType, user.userName])
-    super
-      .register('delete-user', deleteUserQuery, user => [user.userId])
-    super
-      .register('subtract-balance', subtract_user_balance, user => [user.balance, user.id])
-    super
-      .register('add-balance', add_user_balance, user => [user.balance, user.id])
-    super
-      .register('user-count', userCountQuery, () => [])
+    super.register('create', create_user_query, user => [user.username, user.displayName, user.userType, user.passwordHash])
+    super.register('get-by-username', get_user_by_username_query, user => [user.username])
+    super.register('get-by-session', get_user_by_session_query, user => [user.sessionId])
+    super.register('update-profile-by-session', update_user_profile_by_session_query, user => [user.sessionId, user.username, user.displayName])
+    super.register('update-password-by-session', update_user_password_by_session_query, user => [user.sessionId, user.passwordHash])
+    super.register('get-basic-info', get_user_basic_info_query, user => [user.username])
+    super.register('get-listings', get_user_listings_query, user => [user.username])
+    super.register('get-items', get_user_items_query, user => [user.username])
+    super.register('get-users-by-type-username', getAllUsersByTypeAndUsernameQuery, user => [user.userType, user.userName])
+    super.register('delete-user', deleteUserQuery, user => [user.userId])
+    super.register('subtract-balance', subtract_user_balance, user => [user.balance, user.id])
+    super.register('add-balance', add_user_balance, user => [user.balance, user.id])
+    super.register('user-count', userCountQuery, () => [])
   }
 
   public async createUser(user: create_user_spec) {
@@ -276,6 +264,10 @@ export default class UserModel extends Model {
     const users = await super.execute('get-users-by-type-username', { userType: ut, userName: u });
 
     return users as Omit<IUser, "passwordHash">[]
+  }
+
+  public async sellInventory(inventory: inventory_sell_spec) {
+
   }
   
   public async subtractBalance(user: update_balance_spec) {

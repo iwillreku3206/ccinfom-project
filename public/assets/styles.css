@@ -1,7 +1,7 @@
 html,
 body {
   margin: 0;
-  padding: 0;
+ * @ Modified time: 2024-11-24 09:28:45
 }
 
 .center-container {
@@ -152,7 +152,29 @@ form button {
   padding-top: 1em;
 }
 
+.delete-button {
+  color: red;
+}
+
+.delete-button:disabled {
+  color: rgba(255, 0, 0, 0.5);
+}
+
 fieldset {
   background-color: white;
   margin: 0.5em;
+}
+
+/* Tooltip */
+.tooltip {
+  position: fixed;
+  padding: 0.5em;
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  border-radius: 0.2em;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  pointer-events: none;
+  transform: translate(-50%, -125%);
 }

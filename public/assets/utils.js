@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-22 14:42:30
- * @ Modified time: 2024-11-23 19:37:51
+ * @ Modified time: 2024-11-24 10:06:59
  * @ Description:
  * 
  * A bunch of front-end utils just to make our lives easier.
@@ -77,9 +77,11 @@ const DOM = (() => {
 	 */
 	_.select = (selector) => (
 		((selection) => (
-			selection.length === 1 
-				? fluent(selection[0])
-				: Array.from(selection).map(s => fluent(s)) 
+			!selection.length
+				? null
+				: selection.length === 1 
+					? fluent(selection[0])
+					: Array.from(selection).map(s => fluent(s)) 
 		))(document.querySelectorAll(selector)) 
 	)
 
@@ -87,7 +89,7 @@ const DOM = (() => {
 	 * Create a post request to the target with the given body.
 	 * 
 	 * @param target	The target of the post request.
-	 * @returns				A promise containing the result of the request. 
+	 * @returns				A promise containing the result of the request, or a redirection.
 	 */
 	_.post = (target, content) => (
 		fetch(target, {
@@ -95,7 +97,52 @@ const DOM = (() => {
 			headers: { 'Content-Type': 'application/json' }, 
 			body: JSON.stringify(content)
 		})
+		.then(data => data.json())
+		.then(data => 
+			data.redirect 
+				? location.href = data.redirect
+				: data)
 	)
+
+	/**
+	 * Creates a tooltip on the spot
+	 * 
+	 * @param	text	The text to use for the tooltip.
+	 */
+	_.tooltip = 
+		((timeout, tooltip) => (
+
+			// Create the tooltip element
+			tooltip = _.element('div')
+				.class('tooltip')
+				.stl({ display: 'none' }),
+			document.body.appendChild(tooltip),
+
+			// Mouse move updates
+			document.onmousemove = (e) => (
+				tooltip.stl({
+					top: e.clientY + 'px',
+					left: e.clientX + 'px',
+				})
+			),
+
+			// Create the function that displays it
+			(text) => (
+				text === undefined
+
+					// If not text, just hide the tooltip
+					? tooltip.stl({ display: 'none' })
+
+					// Otherwise, display with text
+					: (
+						clearTimeout(timeout),
+						tooltip.stl({ display: 'block' }).txt(text),
+						timeout = setTimeout(() => (
+							tooltip.stl({ display: 'none' })
+						), 1000)	
+					)
+			)
+		))()		
 
 	return {
 		..._

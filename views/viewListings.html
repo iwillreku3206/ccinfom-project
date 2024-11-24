@@ -116,9 +116,7 @@
 				td().txt(listing.price),
 				td().txt(listing.seller),
 				td().append(button().stl({ color: 'blue' }).txt('buy'))
-					.listen('click', () => DOM.post('/listing/buy', { listing_id: listing.id })
-					.then(data => data.json())
-					.then(data => location.href = '?error=' + data.error)),
+					.listen('click', () => DOM.post('/listing/buy', { listing_id: listing.id }),
 				br()
 			)
 		)

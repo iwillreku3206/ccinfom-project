@@ -1,11 +1,11 @@
 /**
  * @ Author: Group 1
  * @ Create Time: 2024-11-23 02:09:04
- * @ Modified time: 2024-11-23 12:07:50
+ * @ Modified time: 2024-11-24 09:59:54
  * @ Description:
  */
 
-import { type RowDataPacket, type ResultSetHeader } from "mysql2"
+import { type RowDataPacket, type ResultSetHeader, type QueryResult } from "mysql2"
 import Model, { type SQLValueList } from "./model"
 import type { IItem } from "./item"
 import ItemModel from "./item"
@@ -25,6 +25,15 @@ const create_game_query = `
     INSERT INTO \`games\` 
     (name, description) 
     VALUES (?, ?);
+`
+
+const get_game_by_id_query = `
+    SELECT      id,
+                name,
+                description
+    FROM        \`games\`
+    WHERE       id = ?
+    LIMIT       1;
 `
 
 const get_game_by_name_query = `
@@ -65,6 +74,7 @@ export class GameModel extends Model {
         super()
         super.register('create', create_game_query, game => [ game.name, game.description ])
         super.register('get-all', get_all_games_query, _ => [])
+        super.register('get-by-id', get_game_by_id_query, game => [ game.id ])
         super.register('get-by-name', get_game_by_name_query, game => [ game.name ])
         super.register('delete', delete_game_query, game => [ game.id ])
     }
@@ -94,7 +104,22 @@ export class GameModel extends Model {
      * @param gameName  The name of the game to grab. 
      * @returns         The specified game.
      */
-    public async getGame(game: get_game_by_name_spec): Promise<IGame | null> {
+    public async getGame(game: get_game_by_id_spec): Promise<IGame | null> {
+        const results = await this.execute<RowDataPacket[]>('get-by-id', game)
+    
+        // Return null or the game retrieved
+        if (results.length < 1)
+            return null
+        return results[0] as IGame
+    }
+
+    /**
+     * Grabs a specific game from the db.
+     * 
+     * @param gameName  The name of the game to grab. 
+     * @returns         The specified game.
+     */
+    public async getGameByName(game: get_game_by_name_spec): Promise<IGame | null> {
         const results = await this.execute<RowDataPacket[]>('get-by-name', game)
     
         // Return null or the game retrieved
@@ -118,7 +143,8 @@ export class GameModel extends Model {
 
     }
 
-    public async deleteGame(game: delete_game_spec) {
-        await this.execute('delete', {})
+    public async deleteGame(game: delete_game_spec): Promise<QueryResult | null> {
+        const success = await this.execute('delete', game)
+        return success
     }
 }
