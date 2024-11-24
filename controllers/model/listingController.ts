@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-16 11:34:48
- * @ Modified time: 2024-11-24 10:08:39
+ * @ Modified time: 2024-11-24 10:48:06
  * @ Description:
  * 
  * A controller for the listings-related pages and functionality.
@@ -105,19 +105,19 @@ listingRouter.post(`/buy`, async (req, res) => {
   const listing = await ListingModel.instance.getListing({ id: listing_id })
   if(!listing) return
   if(user.id == listing.seller) {
-    res.send({ redirect: 'listing/view?error=sellerequalsbuyer' })
+    res.send({ error: 'sellerequalsbuyer' })
     return
   }
   if(parseFloat(user.balance) < listing.price) {
-    res.send({ redirect: 'listing/view?error=insufficientfunds' })
+    res.send({ error: 'insufficientfunds' })
     return
-  }
+}
   
   // Buy listing
   await ListingModel.instance.buyListing({ id: listing_id, buyer_id: user.id })
 
   // Succssful transaction
-  res.send({ redirect: 'listing/view?error=successfulpurchase' })
+  res.send({ error: 'successfulpurchase' })
 })
 
 listingRouter.post(`/buy/getListings`, async (req, res) => {

@@ -11,7 +11,7 @@
 		<main class="center-container">
 			<div class="window" style="width: 300px">
 				<div class="title-bar">
-					<div class="title-bar-text">Vapor Market - Game Info</div>
+					<div class="title-bar-text">Vapor Market - Item Info</div>
 					<div class="title-bar-controls">
 						<button aria-label="Close" onclick="location.href='/home'"></button>
 					</div>
@@ -19,7 +19,7 @@
 				<div class="window-body" style="background: white">
 	
 					<fieldset>
-						<legend>{{game}}</legend>
+						<legend>{{item}}</legend>
 						<p>{{description}}</p>
 						
 						{{#admin}}
@@ -32,7 +32,7 @@
 					</fieldset>
 					
 					<fieldset>
-						<legend>Items</legend>
+						<legend>Listings</legend>
 						<table class="table">
 		
 						</table>
@@ -45,7 +45,7 @@
 		<script>
 
 			// DOM stuff we'll use
-			const items = JSON.parse(`{{{itemData}}}`) ?? [];
+			const listings = JSON.parse(`{{{listingData}}}`) ?? [];
 			const table = DOM.select('.table')
 			const delete_button = DOM.select('.delete-button')
 
@@ -59,31 +59,36 @@
 			// Adds the headers of the table
 			table.append(
 				tr().append(
-					th().txt('Item'),
-					th().txt('Description'),
+					th().txt('Listing ID'),
+					th().txt('Item ID'),
+					th().txt('Price'),
+					th().txt('Seller ID'),
 					th()
 				)
 			)
 
 			/**
-				* Maps each games to a table row.
+				* Maps each listing to a table row.
 				*/
-			const item_mapper = (item) => (
-				tr().class('table-row').append(
-					td().txt(item.name),
-					td().txt(item.description),
-					td().append(button().stl({ color: 'blue' }).txt('view'))
-						.listen('click', () => (location.href = '/item/instance?id=' + item.id)),
-					br()
+			const listing_mapper = (listing) => (
+					tr().class('table-row').append(
+						td().txt(listing.id),
+						td().txt(listing.item),
+						td().txt(listing.price),
+						td().txt(listing.seller),
+						td().append(button().stl({ color: 'blue' }).txt('buy'))
+							.listen('click', () => DOM.post('/listing/buy', { listing_id: listing.id }),
+						br()
+					)
 				)
 			)
 
-			items.length && delete_button && delete_button
+			listings.length && delete_button && delete_button
 				.attribs({ disabled: true })
-				.listen('mousemove', () => DOM.tooltip('You cannot delete games with items.'))
+				.listen('mousemove', () => DOM.tooltip('You cannot delete items with listings.'))
 				.listen('mouseout', () => DOM.tooltip())
-			items.map(item_mapper).map(e => table.append(e))
-			delete_button.listen('click', () => DOM.post('/game/delete', { id: '{{id}}' }))
+			listings.map(listing_mapper).map(e => table.append(e))
+			delete_button.listen('click', () => DOM.post('/item/delete', { id: '{{{id}}}' }))
 		</script>
 	</body> 
 

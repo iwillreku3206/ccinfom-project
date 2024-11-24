@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-22 14:42:30
- * @ Modified time: 2024-11-24 10:06:59
+ * @ Modified time: 2024-11-24 10:59:48
  * @ Description:
  * 
  * A bunch of front-end utils just to make our lives easier.
@@ -98,10 +98,15 @@ const DOM = (() => {
 			body: JSON.stringify(content)
 		})
 		.then(data => data.json())
-		.then(data => 
-			data.redirect 
-				? location.href = data.redirect
-				: data)
+		.then(data => (
+			((url) => (
+				Object.keys(data).map(key => url.searchParams.set(key, data[key])),
+				console.log(url.toString()),
+				location.href = url.toString()
+			))(data.redirect 
+				? new URL(data.redirect, new URL(location.href).origin) 
+				: new URL(location.href))
+		))
 	)
 
 	/**

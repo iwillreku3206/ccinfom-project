@@ -11,6 +11,7 @@ export interface IItem {
 }
 
 type create_item_spec = Omit<IItem, 'id'>
+type get_item_by_id_spec = Pick<IItem, 'id'>
 type get_item_by_name_spec = Pick<IItem, 'name'>
 type get_items_by_game_spec = { game: number }
 type delete_item = Pick<IItem, 'id'>
@@ -23,6 +24,15 @@ const create_item_query = `
 
 const get_all_item_query = `
     SELECT * FROM \`items\`;
+`
+
+const get_item_by_id_query = `
+    SELECT      id,
+                name,
+                description,
+                game
+    FROM        \`items\`
+    WHERE       id = ?
 `
 
 const get_item_by_name_query = `
@@ -95,6 +105,7 @@ export default class ItemModel extends Model {
     super()
     super.register('create', create_item_query, item => [item.name, item.description, item.game])
     super.register('get-all', get_all_items, _ => [])
+    super.register('get-by-id', get_item_by_id_query, item => [item.id])
     super.register('get-by-name', get_item_by_name_query, item => [item.name])
     super.register('get-all-with-gamename', get_all_items_with_game_name, _ => [])
     super.register('get-by-game', get_items_by_game_query, item => [item.game])
@@ -104,6 +115,20 @@ export default class ItemModel extends Model {
 
   public async createItem(item: create_item_spec) {
     await super.execute('create', item as SQLValueList)
+  }
+
+  public async getItem(item: get_item_by_id_spec) {
+    const results = await super.execute<RowDataPacket[]>("get-by-id", item)
+    if (results.length < 1) {
+      return null
+    }
+
+    if (!results[0].id || !results[0].name || !results[0].description || !results[0].game) {
+      log.error("Invalid item: ", JSON.stringify(results[0]))
+      return null
+    }
+
+    return results[0] as IItem
   }
 
   public async getAllItems(): Promise<IItem[]> {
@@ -140,7 +165,7 @@ export default class ItemModel extends Model {
   }
 
   public async deleteItem(item: delete_item) {
-    await super.execute('delete', {})
+    return await super.execute('delete', item)
   }
 
   public async getItemsByGame(item: get_items_by_game_spec): Promise<IItem[] | null> {

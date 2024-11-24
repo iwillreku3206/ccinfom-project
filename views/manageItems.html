@@ -37,6 +37,8 @@
                             <button type="submit">Add</button>
                         </div>
                     </form>
+
+                    <p class="error">{{error}}</p>
                 </fieldset>
                 
                 <fieldset>
@@ -83,8 +85,7 @@
 					td().txt(item.name),
 					td().txt(item.game),
 					td().txt(item.description),
-					td().append(button().stl({ color: 'blue' }).txt('view')).listen('click', () => (location.href = '/items/item?item=' + item.name)),
-					td().append(button().stl({ color: 'blue' }).txt('delete')).listen('click', () => (location.href = '/items/item?DELETEGAME')),
+					td().append(button().stl({ color: 'blue' }).txt('view')).listen('click', () => (location.href = '/item/instance?id=' + item.id)),
 					br()
 				)
 			)

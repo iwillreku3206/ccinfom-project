@@ -110,14 +110,15 @@
 			* Maps each listing to a table row.
 			*/
 		const listing_mapper = (listing) => (
-			tr().class('table-row').append(
-				td().txt(listing.id),
-				td().txt(listing.item),
-				td().txt(listing.price),
-				td().txt(listing.seller),
-				td().append(button().stl({ color: 'blue' }).txt('buy'))
-					.listen('click', () => DOM.post('/listing/buy', { listing_id: listing.id }),
-				br()
+				tr().class('table-row').append(
+					td().txt(listing.id),
+					td().txt(listing.item),
+					td().txt(listing.price),
+					td().txt(listing.seller),
+					td().append(button().stl({ color: 'blue' }).txt('buy'))
+						.listen('click', () => DOM.post('/listing/buy', { listing_id: listing.id }),
+					br()
+				)
 			)
 		)
 

@@ -40,7 +40,7 @@ gameRouter.get('/instance', async (req: Request, res: Response) => {
   const { game } = req?.query ?? {};
 
   // Grab the games then render
-  const gameData = await model.getGameByName({ name: game })
+  const gameData = await model.getGame({ id: game })
   if(!gameData) return res.redirect('/instance?error=gamenotfound')
   
   // Grab listings
@@ -61,8 +61,8 @@ gameRouter.get('/instance', async (req: Request, res: Response) => {
 
 gameRouter.post('/', async (req: Request, res: Response) => {
   const { user, model, error } = res.locals;
-  const name = req?.body?.name;
-  res.redirect("/game?name=" + name)
+  const id = req?.body?.id;
+  res.redirect("/game?id=" + id)
 })
 
 gameRouter.post('/delete', async (req: Request, res: Response) => {
@@ -72,12 +72,12 @@ gameRouter.post('/delete', async (req: Request, res: Response) => {
   const result = await GameModel.instance.deleteGame({ id }) as ResultSetHeader
   
   if(!result || result.affectedRows < 1) {
-    res.send({ redirect: '/game/instance?error=couldnotdelete&name=' + game?.name })
+    res.send({ error: 'couldnotdelete', id: game?.id })
     return
   }
 
   if(result.affectedRows === 1) {
-    res.send({ redirect: '/game?error=successfuldeletion'  })
+    res.send({ redirect: '/game', error: 'successfuldeletion'  })
     return
   }
 

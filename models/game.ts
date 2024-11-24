@@ -1,7 +1,7 @@
 /**
  * @ Author: Group 1
  * @ Create Time: 2024-11-23 02:09:04
- * @ Modified time: 2024-11-24 09:59:54
+ * @ Modified time: 2024-11-24 11:09:56
  * @ Description:
  */
 
@@ -144,7 +144,6 @@ export class GameModel extends Model {
     }
 
     public async deleteGame(game: delete_game_spec): Promise<QueryResult | null> {
-        const success = await this.execute('delete', game)
-        return success
+        return await this.execute('delete', game)
     }
 }
