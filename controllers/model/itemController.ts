@@ -16,9 +16,9 @@ itemRouter.use(errorHandler(new Map([
   [ 'sellerequalsbuyer', 'You cannot buy your own listings.' ]
 ])))
 
-itemRouter.get('/instance', async (req: Request, res: Response) => {
+itemRouter.get('/instance/:id', async (req: Request, res: Response) => {
   const { user, error } = res.locals;
-	const { id } = req.query;
+	const id = req.params.id;
 
   if(!id) {
     res.redirect('/game/')

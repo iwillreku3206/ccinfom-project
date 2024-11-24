@@ -2,7 +2,7 @@ import argon2 from "argon2"
 import { type RowDataPacket } from "mysql2"
 import Model, { type SQLValueList } from "./model"
 import type { IListing } from "./listing"
-import type { UserInventoryItems } from "./userInventoryItems"
+import type { UserInventoryItems } from "./inventory"
 import log from "log"
 
 export interface IUser {

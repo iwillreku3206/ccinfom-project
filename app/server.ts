@@ -7,10 +7,9 @@ import cookieParser from 'cookie-parser'
 import { profileRouter } from '../controllers/model/profileController'
 import { gameRouter } from '../controllers/model/gamesController'
 import { listingRouter } from '../controllers/model/listingController'
-import { userInvItemsRouter } from '../controllers/model/uiiController'
+import { inventoryRouter } from '../controllers/model/inventoryController'
 import { adminRouter } from '../controllers/admin/adminController'
 import { itemRouter } from '../controllers/model/itemController'
-import { buyingRouter } from '../controllers/model/buyingController'
 
 export const app = express()
 
@@ -37,4 +36,4 @@ app.use("/profile", profileRouter)
 app.use("/game", gameRouter)
 app.use("/listing", listingRouter)
 app.use("/item", itemRouter)
-app.use("/userInventoryItems", userInvItemsRouter)
+app.use("/inventory", inventoryRouter)

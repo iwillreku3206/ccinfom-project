@@ -35,12 +35,12 @@ gameRouter.get('/', async (req: Request, res: Response) => {
   })
 })
 
-gameRouter.get('/instance', async (req: Request, res: Response) => {
+gameRouter.get('/instance/:id', async (req: Request, res: Response) => {
   const { user, model, error } = res.locals;
-  const { game } = req?.query ?? {};
+  const id= req.params.id;
 
   // Grab the games then render
-  const gameData = await model.getGame({ id: game })
+  const gameData = await model.getGame({ id })
   if(!gameData) return res.redirect('/instance?error=gamenotfound')
   
   // Grab listings

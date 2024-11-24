@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>Vapor Community Market</title>
+		<link rel="stylesheet" href="/assets/xp.css">
+		<link rel="stylesheet" href="/assets/styles.css">
+	</head>
+
+	<body>
+		<main class="center-container">
+			<div class="window" style="width: 300px">
+				<div class="title-bar">
+					<div class="title-bar-text">Vapor Market - Inventory Item Info</div>
+					<div class="title-bar-controls">
+						<button aria-label="Close" onclick="location.href='/home'"></button>
+					</div>
+				</div>
+				<div class="window-body" style="background: white">
+					<fieldset>
+						<legend>{{inventoryItem}}</legend>
+						<p>{{description}}</p>
+            <img src="https://loremflickr.com/320/240?lock={{itemId}}" />
+          </fieldset>
+
+          <fieldset>
+            <legend>List Item for Selling</legend>
+            <form method="POST" action="/inventory/sell">
+              <div class="field-row">
+                <input type="hidden" step="0.01" min="0" id="id" name="id" value="{{id}}" />
+              </div>
+              <div class="field-row">
+                <label for="price">Listing Price</label>
+                <input type="number" step="0.01" min="0" id="price" name="price" required />
+              </div>
+              <div class="field-row form-buttons">
+                <button type="submit">Sell</button>
+              </div>
+            </form>
+						<p class="error">{{error}}</p>
+					</fieldset>
+				</div>
+				<div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
+			</div>
+		</main>
+	</body> 
+</html>

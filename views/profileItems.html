@@ -11,22 +11,18 @@
 
     <div class="window" style="width: 500px">
       <div class="title-bar">
-        
         <div class="title-bar-text"><p>{{displayName}} ({{username}})'s items</p></div>
-
         <div class="title-bar-controls">
           <button aria-label="Close" onclick="location.href='/'"></button>
         </div>
-        
       </div>
       <div class="window-body">
-        
-        <p>Items: <span style="color: red" id="mesError"></span></p>
-        
-        <table class="table">
-	
-        </table>
-        
+        <fieldset>
+          <legend>Current Inventory</legend>
+          <p class="error">{{error}}</p>
+          <table class="table">
+          </table>
+        </fieldset>
       </div>
       <div class="status-bar">Signed in as {{displayName}} ({{username}})</div>
     </div>
@@ -35,11 +31,7 @@
 </body>
 <script src="/assets/utils.js"></script>
 <script type="module">
-  const mustache_message = `{{{error}}}`;
-  const mustache_items    = `{{{items}}}`
-
-  const items = JSON.parse(mustache_items) 
-  const visual_error = document.getElementById("mesError")
+  const items = JSON.parse(`{{{items}}}`) 
   const table = DOM.select('.table')
 
   // The new elements we'll use
@@ -54,36 +46,28 @@
     tr().append(
       th().txt('Game Name'),
       th().txt('Item Name'),
-      th().txt('Item ID'),
       th().txt('Item Description'),
-      th().txt('Obtained On')
+      th().txt('Obtained On'),
+      th()
     )
   )
 
   /**
     * Maps each listing to a table row.
     */
-  const listing_mapper = (listing) => (
-    console.log(list)
-    /**
+  const item_mapper = (inventory) => (
     tr().class('table-row').append(
-      td().txt(listing.game_name),
-      td().txt(listing.item_name),
-      td().txt(listing.item_id),
-      td().txt(listing.item_description),
-      td().txt(listing.obtained_on),
+      td().txt(inventory.game_name),
+      td().txt(inventory.item_name),
+      td().txt(inventory.item_description),
+      td().txt(inventory.obtained_on),
+      td().append(button().stl({ color: 'blue' }).txt('view'))
+        .listen('click', (() => location.href = '/inventory/instance/' + inventory.id)),
       br()
     )
-    */
   )
   
-  items.map(listing_mapper).map(e => table.append(e))
-
-  if (items.length ==0) {
-    visual_error.innerText = "No Items."
-  } else if (mustache_message.length > 0){
-    visual_error.value = mustache_message
-  }
+  items.map(item_mapper).map(e => table.append(e))
 </script>
 
 

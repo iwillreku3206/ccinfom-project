@@ -73,7 +73,7 @@
         tr().class('table-row').append(
           td().txt(game.name),
           td().txt(game.description),
-          td().append(button().stl({color: 'blue'}).txt('view')).listen('click', () => (location.href = '/game/instance?game=' + game.id)),
+          td().append(button().stl({color: 'blue'}).txt('view')).listen('click', () => (location.href = '/game/instance/' + game.id)),
           br()
         )
       )

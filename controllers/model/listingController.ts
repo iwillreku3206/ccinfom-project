@@ -1,7 +1,7 @@
 /**
  * @ Author: Group ??
  * @ Create Time: 2024-11-16 11:34:48
- * @ Modified time: 2024-11-24 10:48:06
+ * @ Modified time: 2024-11-24 13:15:09
  * @ Description:
  * 
  * A controller for the listings-related pages and functionality.
@@ -80,21 +80,6 @@ listingRouter.post('/view', async (req, res) => {
     displayName: user?.displayName || user?.username,
     listingData, error 
   })
-})
-
-/**
- * A request for posting a new listing in the database.
- */
-listingRouter.post('/post', async (req, res) => {
-  const { user, model, error } = res.locals;
-
-  // ! todo, search for item in item database
-  // ! then create listing
-  // ! remove random price lmao
-
-  model.createListing({ item: 1, price: Math.random() * 1000, seller: user.id })
-    .then(() => res.redirect('/home'))
-    .catch((error: Error) => res.status(500).redirect('/listing/create?error=' + error))
 })
 
 listingRouter.post(`/buy`, async (req, res) => {

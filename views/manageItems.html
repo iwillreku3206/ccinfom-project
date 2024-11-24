@@ -85,7 +85,7 @@
 					td().txt(item.name),
 					td().txt(item.game),
 					td().txt(item.description),
-					td().append(button().stl({ color: 'blue' }).txt('view')).listen('click', () => (location.href = '/item/instance?id=' + item.id)),
+					td().append(button().stl({ color: 'blue' }).txt('view')).listen('click', () => (location.href = '/item/instance/' + item.id)),
 					br()
 				)
 			)
