@@ -90,6 +90,21 @@ const get_items_with_game_name_from_id = `
     WHERE       i.id = ?;
 `
 
+const items_listed_report = `
+    SELECT      i.id as itemID,
+                i.name as itemName, 
+                MONTHNAME(l.list_date) as month,
+                COUNT(l.id) as listingCount
+    FROM        items i
+    LEFT JOIN   listings l
+        ON      l.item = i.id
+    WHERE       i.id = ?
+        AND     YEAR(l.list_date) = ?
+    GROUP BY    i.name, month
+    ORDER BY    listingCount DESC;
+`
+
+
 export default class ItemModel extends Model {
   static #instance: ItemModel
 
@@ -111,6 +126,7 @@ export default class ItemModel extends Model {
     super.register('get-by-game', get_items_by_game_query, item => [item.game])
     super.register('delete', delete_item_query, item => [item.id])
     super.register('get_items_with_game_name_from_id ', get_items_with_game_name_from_id, item => [item.id])
+    super.register('listingreport', items_listed_report, l => [l.itemId, l.year])
   }
 
   public async createItem(item: create_item_spec) {
@@ -174,5 +190,9 @@ export default class ItemModel extends Model {
     if (results.length < 1)
       return null
     return results.map((r: RowDataPacket) => (r as IItem))
+  }
+
+  public async itemsListedReport(itemId: number, year: number): Promise<{itemId: number, itemName: string, monthName: string, listingCount: number}[]> {
+    return await this.execute('listingreport', { itemId, year }) as {itemId: number, itemName: string, monthName: string, listingCount: number}[]
   }
 }

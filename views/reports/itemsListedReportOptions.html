@@ -12,7 +12,7 @@
   <main class="center-container">
     <div class="window" style="width: 300px">
       <div class="title-bar">
-        <div class="title-bar-text">User Items Report</div>
+        <div class="title-bar-text">Market Price Report</div>
         <div class="title-bar-controls">
           <button aria-label="Close" onclick="location.href='/home'"></button>
         </div>
@@ -20,9 +20,15 @@
       <fieldset>
         <div style="color:red;">{{error}}</div>
         <legend>Settings</legend>
-        <form action="/admin/reports/activeCountReport" method="get">
+        <form action="/admin/reports/itemsListedReport" method="get">
           <label for="year">Year:</label>
           <input type="number" name="year" id="year">
+          <label for="year">Item</label>
+          <select name="item" id="item">
+            {{#items}}
+            <option value="{{id}}">{{name}} ({{game}})</option>
+            {{/items}}
+          </select>
           <button type="submit">Generate</button>
         </form>
       </fieldset>
